@@ -90,14 +90,26 @@ export default function LandingPage() {
       <section className="noise relative overflow-hidden border-b border-line">
         <div className="grid-bg absolute inset-0 opacity-40" aria-hidden />
 
-        {/* Live 3D dependency lattice. Sits behind the type, masked at the edges so
-            it never competes with the headline. */}
+        {/* Live 3D dependency lattice, shot like film: a camera eases through a
+            loop of framings with a travelling focal plane. Masked off-centre so
+            the defocused side of the frame sits under the headline. */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.85] [mask-image:radial-gradient(circle_at_62%_50%,black,transparent_72%)]"
+          className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_92%_100%_at_64%_50%,black_44%,transparent_88%)]"
           aria-hidden
         >
           <KnowledgeField />
         </div>
+
+        {/* Letterbox falloff. Bleeds the plate into the section edges instead of
+            ending it on a hard line. */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-canvas to-transparent"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-canvas to-transparent"
+          aria-hidden
+        />
 
         <div
           className="pointer-events-none absolute -left-40 top-1/3 h-[520px] w-[520px] rounded-full bg-accent opacity-[0.06] blur-[120px]"

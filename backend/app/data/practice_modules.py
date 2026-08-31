@@ -823,6 +823,55 @@ ROTATE_IO = {
     "output_format": "A single line containing the rotated array, space-separated.",
 }
 
+#: Worked examples. The second one is deliberately the `k > n` case, because
+#: reducing k by the length is the step most first attempts miss and the one
+#: requirement 3 is really about.
+ROTATE_EXAMPLES = [
+    {
+        "stdin": "5 2\n1 2 3 4 5\n",
+        "stdout": "4 5 1 2 3",
+        "explanation": (
+            "The last two elements, 4 and 5, move to the front and everything "
+            "else shifts right by two."
+        ),
+    },
+    {
+        # Deliberately not the hidden `k > n` case's input: an example is public,
+        # so reusing a hidden input here would publish that case's answer.
+        "stdin": "4 6\n1 2 3 4\n",
+        "stdout": "3 4 1 2",
+        "explanation": (
+            "k = 6 on a 4-element array is the same as k = 2, because 6 % 4 = 2. "
+            "Rotating six single steps reaches the same answer as reducing k "
+            "first, but only one of the two finishes within the time limit."
+        ),
+    },
+]
+
+def _rotate_scale_case() -> dict[str, Any]:
+    """The case that makes requirement 3 ("linear time") enforceable.
+
+    Without it the largest input here was n = 5, so the repeated single-step
+    rotation the requirement forbids passed every case — the constraint said
+    n <= 100000 and nothing ever tested past a hand-sized array. At n = 100000
+    with k = 999999999, reducing k modulo n finishes in milliseconds while
+    stepping k times is ~10^14 operations and cannot finish inside the limit.
+
+    Built rather than written out because the expected output is 100000 numbers;
+    as a literal it would be ~600KB of source for one assertion.
+    """
+    n, k = 100000, 999999999
+    arr = list(range(1, n + 1))
+    shift = k % n
+    rotated = arr[-shift:] + arr[:-shift]
+    return {
+        "name": "hidden: scale — reduce k before rotating",
+        "stdin": f"{n} {k}\n" + " ".join(map(str, arr)) + "\n",
+        "expected_stdout": " ".join(map(str, rotated)),
+        "hidden": True,
+    }
+
+
 ROTATE_TESTS = [
     {"name": "sample: rotate by 2", "stdin": "5 2\n1 2 3 4 5\n", "expected_stdout": "4 5 1 2 3", "hidden": False},
     {"name": "sample: single element", "stdin": "1 3\n7\n", "expected_stdout": "7", "hidden": False},
@@ -830,6 +879,7 @@ ROTATE_TESTS = [
     {"name": "hidden: k = 0", "stdin": "3 0\n9 8 7\n", "expected_stdout": "9 8 7", "hidden": True},
     {"name": "hidden: k > n", "stdin": "5 7\n1 2 3 4 5\n", "expected_stdout": "4 5 1 2 3", "hidden": True},
     {"name": "hidden: negatives", "stdin": "5 1\n-1 -2 -3 -4 -5\n", "expected_stdout": "-5 -1 -2 -3 -4", "hidden": True},
+    _rotate_scale_case(),
 ]
 
 LANGUAGE_STARTERS = {
@@ -965,6 +1015,7 @@ for _language, (_prefix, _label, _skill, _difficulty) in LANGUAGE_LABELS.items()
             "constraints": ROTATE_IO["constraints"],
             "input_format": ROTATE_IO["input_format"],
             "output_format": ROTATE_IO["output_format"],
+            "examples": ROTATE_EXAMPLES,
             "requirements": [
                 "Handle k larger than the array length",
                 "Handle k = 0 without changing the array",

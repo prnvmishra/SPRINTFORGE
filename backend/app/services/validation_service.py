@@ -249,6 +249,11 @@ JS_CHECK_TYPES = {
     "js_loading_sequence",
     "js_not_trivial",
     "js_no_unreachable",
+    "js_endpoint_pair",
+    "js_state_pair",
+    "js_catch_sets_state",
+    "js_handlers_implemented",
+    "js_route_status",
 }
 
 
@@ -317,6 +322,147 @@ def _write_targets(root: Any) -> set[str]:
         else:
             targets.add(js_ast.dotted_name(node.get("callee")))
     return {t for t in targets if t}
+
+
+_ROUTE_METHODS = {"get", "post", "put", "patch", "delete", "all", "options", "head"}
+
+
+def _route_handlers(ast: dict[str, Any]) -> list[tuple[str, str, dict[str, Any]]]:
+    """(method, path, handler) for every `app.get("/path", handler)` in the file.
+
+    The last function argument is taken as the handler, so a route registered
+    with middleware in front of it still resolves to the thing that answers.
+    """
+    routes: list[tuple[str, str, dict[str, Any]]] = []
+    for call in js_ast.nodes_of_type(ast, "CallExpression"):
+        dotted = js_ast.dotted_name(call.get("callee"))
+        method = dotted.rsplit(".", 1)[-1].lower()
+        if "." not in dotted or method not in _ROUTE_METHODS:
+            continue
+        arguments = call.get("arguments") or []
+        if len(arguments) < 2:
+            continue
+        first = arguments[0] or {}
+        if first.get("type") != "Literal" or not isinstance(first.get("value"), str):
+            continue
+        handler = arguments[-1] or {}
+        if handler.get("type") not in {"FunctionExpression", "ArrowFunctionExpression"}:
+            continue
+        routes.append((method, first["value"], handler))
+    return routes
+
+
+def _status_calls(scope: Any) -> set[int]:
+    """Numeric codes passed to a `.status(...)` call, or to `sendStatus`."""
+    codes: set[int] = set()
+    for call in js_ast.nodes_of_type(scope, "CallExpression"):
+        name = js_ast.dotted_name(call.get("callee")).rsplit(".", 1)[-1]
+        if name not in {"status", "sendStatus", "writeHead"}:
+            continue
+        for argument in call.get("arguments") or []:
+            value = (argument or {}).get("value")
+            if isinstance(value, int) and not isinstance(value, bool):
+                codes.add(value)
+    return codes
+
+
+def _conditional_status_calls(handler: dict[str, Any]) -> set[int]:
+    """Status codes a handler only sends down a branch.
+
+    A 404 that is sent unconditionally is not "returns 404 when missing" — it is
+    a route that always fails. Looking inside the handler's own conditionals is
+    what tells the two apart.
+    """
+    codes: set[int] = set()
+    body = handler.get("body")
+    for node in js_ast.walk(body):
+        kind = node.get("type")
+        if kind == "IfStatement":
+            codes |= _status_calls(node.get("consequent")) | _status_calls(node.get("alternate"))
+        elif kind == "ConditionalExpression":
+            codes |= _status_calls(node.get("consequent")) | _status_calls(node.get("alternate"))
+        elif kind == "SwitchCase":
+            codes |= _status_calls(node.get("consequent"))
+        elif kind == "LogicalExpression":
+            codes |= _status_calls(node.get("right"))
+    return codes
+
+
+def _state_setters(ast: dict[str, Any], hook: str = "useState") -> set[str]:
+    """Names bound as the setter half of a `const [value, setValue] = useState()`."""
+    setters: set[str] = set()
+    for node in js_ast.nodes_of_type(ast, "VariableDeclarator"):
+        pattern = node.get("id") or {}
+        init = node.get("init") or {}
+        if pattern.get("type") != "ArrayPattern" or init.get("type") != "CallExpression":
+            continue
+        if js_ast.dotted_name(init.get("callee")).rsplit(".", 1)[-1] != hook:
+            continue
+        elements = pattern.get("elements") or []
+        if len(elements) >= 2 and (elements[1] or {}).get("name"):
+            setters.add(elements[1]["name"])
+    return setters
+
+
+def _is_flag_literal(node: Any) -> bool:
+    """`true`, `false`, `null` or `undefined` — a switch being flipped, not a message."""
+    if not isinstance(node, dict):
+        return False
+    if node.get("type") == "Literal":
+        return node.get("value") in (True, False, None)
+    return node.get("type") == "Identifier" and node.get("name") == "undefined"
+
+
+def _network_reaching_functions(ast: dict[str, Any]) -> dict[str, int]:
+    """Public endpoint functions that reach `fetch`, mapped to their parameter count.
+
+    Private helpers the endpoints delegate to are left out, so the caller sees
+    only the surface the module exposes.
+
+    "Eventually" is the point: in the client the tickets ask for, only the private
+    `request` helper calls `fetch`, and the endpoint functions reach the network
+    through it. Arity then says which endpoint each one is — a collection call
+    needs no id, a single-item call takes one — which is a property of the code
+    rather than of the names the learner happened to choose.
+    """
+    arity: dict[str, int] = {}
+    direct_fetch: dict[str, bool] = {}
+    callees: dict[str, set[str]] = {}
+    for name, fn in _named_functions(ast):
+        if not name:
+            continue
+        body = fn.get("body")
+        arity[name] = len(fn.get("params") or [])
+        calls = js_ast.nodes_of_type(body, "CallExpression")
+        names = {js_ast.dotted_name(call.get("callee")).rsplit(".", 1)[-1] for call in calls}
+        direct_fetch[name] = direct_fetch.get(name, False) or "fetch" in names
+        callees.setdefault(name, set()).update(names)
+
+    resolved: dict[str, bool] = {}
+
+    def reaches(name: str, seen: frozenset[str]) -> bool:
+        if name in resolved:
+            return resolved[name]
+        if name in seen:  # recursion: stop rather than loop forever
+            return False
+        hit = direct_fetch.get(name, False) or any(
+            callee in arity and reaches(callee, seen | {name}) for callee in callees.get(name, ())
+        )
+        resolved[name] = hit
+        return hit
+
+    reaching = {name for name in arity if reaches(name, frozenset())}
+    # The private `request(path)` helper reaches the network and takes an
+    # argument, so on arity alone it looks exactly like a single-item endpoint —
+    # a client with a helper and nothing but a list call would have passed.
+    # What separates them is direction: the helper is the one being called.
+    helpers = {
+        callee
+        for name in reaching
+        for callee in callees.get(name, ())
+        if callee in reaching and callee != name
+    }
+    return {name: arity[name] for name in reaching - helpers}
 
 
 def _dom_writes_by_function(ast: dict[str, Any]) -> dict[str, set[str]]:
@@ -555,6 +701,155 @@ def _run_js_check(check: dict[str, Any], content: str, target: str) -> _JsVerdic
                 )
         return _JsVerdict(True, f"{len(candidates)} function(s) have real bodies")
 
+    if check_type == "js_handlers_implemented":
+        # `app.get("/api/recipes", (req, res) => {})` registered the route, so a
+        # regex looking for the path was satisfied while the endpoint answered
+        # nothing at all. Three empty handlers like this scored full marks.
+        routes = _route_handlers(ast)
+        if not routes:
+            return _JsVerdict(False, "no route handlers were found")
+        empty = [
+            f"{method.upper()} {path}"
+            for method, path, handler in routes
+            if js_ast.statement_is_trivial(handler.get("body"))
+        ]
+        if empty:
+            return _JsVerdict(
+                False,
+                f"{empty[0]} is registered but its handler does nothing "
+                "(empty body, comments only, or a constant return)",
+            )
+        return _JsVerdict(True, f"all {len(routes)} route handlers have real bodies")
+
+    if check_type == "js_route_status":
+        # The status-code checks used to be the bare regex `404` — satisfied by the
+        # number appearing anywhere, including in a comment or an unused array
+        # literal. A status code only means something when a handler sends it, and
+        # for 404/400 only when it is sent down a branch.
+        code = int(check.get("status") or 0)
+        needs_branch = bool(check.get("conditional"))
+        method = (check.get("method") or "").lower()
+        routes = [
+            (m, p, h) for m, p, h in _route_handlers(ast) if not method or m == method
+        ]
+        if not routes:
+            where = f" for a {method.upper()} route" if method else ""
+            return _JsVerdict(False, f"no route handler was found{where}")
+        for m, path, handler in routes:
+            sent = _conditional_status_calls(handler) if needs_branch else _status_calls(handler)
+            if code in sent:
+                branch = " from a branch" if needs_branch else ""
+                return _JsVerdict(True, f"{m.upper()} {path} sends {code}{branch}")
+        if needs_branch and any(code in _status_calls(h) for _, _, h in routes):
+            return _JsVerdict(
+                False,
+                f"{code} is sent unconditionally — it has to be the answer to a "
+                "specific case, not what the route always does",
+            )
+        return _JsVerdict(False, f"no route handler sends a {code} status")
+
+    if check_type == "js_catch_sets_state":
+        # The gap this closes: a component can declare `const [error, setError] =
+        # useState(null)`, render a `role="alert"` branch, and `console.error()` in
+        # the catch — and every individual check passes while the error UI is dead
+        # code that can never appear. Only the wiring between them shows that.
+        setters = _state_setters(ast)
+        if not setters:
+            return _JsVerdict(False, "no useState setter was found to record the failure in")
+        catches = js_ast.nodes_of_type(ast, "CatchClause")
+        if not catches:
+            return _JsVerdict(False, "there is no catch clause, so a failure is never handled")
+        logged_only: list[str] = []
+        for clause in catches:
+            for call in js_ast.nodes_of_type(clause.get("body"), "CallExpression"):
+                name = js_ast.dotted_name(call.get("callee"))
+                if name not in setters:
+                    if name.startswith("console."):
+                        logged_only.append(name)
+                    continue
+                arguments = call.get("arguments") or []
+                if not arguments:
+                    continue
+                # `setLoading(false)` in the catch is housekeeping, not the
+                # failure being recorded. A message — literal or derived from the
+                # caught error — is.
+                if _is_flag_literal(arguments[0]):
+                    continue
+                return _JsVerdict(True, f"the catch clause records the failure with {name}()")
+        if logged_only:
+            return _JsVerdict(
+                False,
+                f"the catch clause only calls {logged_only[0]}() — the error never reaches state, "
+                "so the error UI can never render",
+            )
+        return _JsVerdict(
+            False,
+            "the catch clause never passes the failure to a useState setter, "
+            "so the error UI can never render",
+        )
+
+    if check_type == "js_state_pair":
+        # `const [value, setValue] = useState(...)`. Matched on the destructuring
+        # itself rather than on its source text, because the previous regex
+        # required the hook to be written bare — `React.useState(...)`, which is
+        # the only spelling available from the starter's `import React from
+        # "react"`, failed it — and required the state variable to be *named*
+        # for what it holds.
+        hook = check.get("callee") or "useState"
+        for node in js_ast.nodes_of_type(ast, "VariableDeclarator"):
+            pattern = node.get("id") or {}
+            if pattern.get("type") != "ArrayPattern":
+                continue
+            elements = [e for e in (pattern.get("elements") or []) if e]
+            if len(elements) != 2:
+                continue
+            init = node.get("init") or {}
+            if init.get("type") != "CallExpression":
+                continue
+            if js_ast.dotted_name(init.get("callee")).rsplit(".", 1)[-1] != hook:
+                continue
+            setter = (elements[1] or {}).get("name") or ""
+            if not setter.startswith("set"):
+                return _JsVerdict(
+                    False,
+                    f"the second binding of the {hook} pair is '{setter or 'unnamed'}' — "
+                    "name the setter set* so a reader can tell it apart from the value",
+                )
+            value = (elements[0] or {}).get("name") or "the value"
+            return _JsVerdict(True, f"[{value}, {setter}] is destructured from {hook}")
+        return _JsVerdict(
+            False,
+            f"no `const [value, setValue] = {hook}(...)` pair was found — "
+            f"{hook}'s return value has to be destructured into a value and its setter",
+        )
+
+    if check_type == "js_endpoint_pair":
+        # What makes something an endpoint function is that it reaches the network
+        # and that its arity says which endpoint it is: a collection call needs no
+        # id, a single-item call takes one. Matching names instead (`list…`,
+        # `getAll…`) failed the idiomatic `fetchRecipes()` and could be satisfied
+        # by any leftover `loadMovies()` that never touched the API.
+        reachers = _network_reaching_functions(ast)
+        collection = sorted(n for n, arity in reachers.items() if arity == 0)
+        detail = sorted(n for n, arity in reachers.items() if arity >= 1)
+        # The private request helper takes a path, so it looks like a detail
+        # endpoint. Two distinct names are still required, so it cannot be both.
+        if not collection:
+            return _JsVerdict(
+                False,
+                "no no-argument function reaches the API, so there is no collection endpoint"
+                + (f" (found only {', '.join(detail)})" if detail else ""),
+            )
+        if not detail:
+            return _JsVerdict(
+                False,
+                "no function taking an id reaches the API, so there is no single-item endpoint",
+            )
+        return _JsVerdict(
+            True,
+            f"collection endpoint {collection[0]}() and a single-item endpoint both reach the API",
+        )
+
     if check_type == "js_no_unreachable":
         dead = js_ast.unreachable_statements(ast)
         if dead:
@@ -569,18 +864,52 @@ def _run_js_check(check: dict[str, Any], content: str, target: str) -> _JsVerdic
     return _JsVerdict(False, f"unknown check type '{check_type}'")
 
 
-def _strip_comments(source: str) -> str:
+def _strip_sql_line_comments(source: str) -> str:
+    """Drops `-- …` comments, leaving anything inside a quoted literal alone.
+
+    Only ever applied to `.sql`: in JavaScript `--` is the decrement operator and
+    in CSS it opens a custom property, so stripping it there would corrupt the
+    source the check is about to read.
+    """
+    out: list[str] = []
+    for line in (source or "").splitlines():
+        quote: Optional[str] = None
+        cut = len(line)
+        index = 0
+        while index < len(line):
+            char = line[index]
+            if quote:
+                if char == quote:
+                    quote = None
+            elif char in "'\"":
+                quote = char
+            elif char == "-" and line[index + 1 : index + 2] == "-":
+                cut = index
+                break
+            index += 1
+        out.append(line[:cut])
+    return "\n".join(out)
+
+
+def _strip_comments(source: str, filename: str = "") -> str:
     """Removes HTML, block and line comments before a textual check reads the file.
 
     Commented-out markup renders nothing, so it must not satisfy a positive
     `regex` check — and, symmetrically, must not shield a `not_regex`
     prohibition. An unterminated `<!--` comments out the rest of the file in a
     real browser, so it is dropped here too.
+
+    SQL was the gap: `--` was left in place, so a `schema.sql` containing nothing
+    but comments naming `PRIMARY KEY`, `FOREIGN KEY` and `CREATE INDEX` satisfied
+    every check on the schema ticket.
     """
     text = re.sub(r"<!--.*?-->", "", source or "", flags=re.DOTALL)
     text = re.sub(r"<!--.*\Z", "", text, flags=re.DOTALL)
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
-    return re.sub(r"(?<!:)//[^\n]*", "", text)
+    text = re.sub(r"(?<!:)//[^\n]*", "", text)
+    if filename.lower().endswith(".sql"):
+        text = _strip_sql_line_comments(text)
+    return text
 
 
 # --------------------------------------------------------------------------
@@ -862,13 +1191,13 @@ def run_static_checks(
             detail = check.get("pattern")
 
         elif check_type == "regex":
-            source = content if check.get("keep_comments") else _strip_comments(content)
+            source = content if check.get("keep_comments") else _strip_comments(content, target)
             flags = re.IGNORECASE if check.get("ignore_case") else 0
             passed = bool(re.search(check.get("pattern", ""), source, flags | re.DOTALL))
             detail = check.get("pattern")
 
         elif check_type == "not_regex":
-            source = content if check.get("keep_comments") else _strip_comments(content)
+            source = content if check.get("keep_comments") else _strip_comments(content, target)
             passed = not re.search(check.get("pattern", ""), source, re.DOTALL)
             detail = f"must not contain {check.get('pattern')}"
 

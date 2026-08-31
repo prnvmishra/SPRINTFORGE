@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
-import { Alert, Badge, Loader, Panel, StatusPill } from "@/components/ui/primitives";
+import { Alert, Loader, Panel, StatusPill } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
 import type { Project, Recommendation } from "@/lib/types";
 import { cn, errorMessage } from "@/lib/utils";

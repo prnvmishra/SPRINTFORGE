@@ -161,7 +161,6 @@ export default function ProfilePage() {
                   }
                 />
                 <Stat label="Projects done" value={String(data.completed_projects)} />
-                <Stat label="Preferred L" value={String(data.preferred_difficulty)} />
               </div>
             </div>
           </section>

@@ -460,6 +460,13 @@ class PistonProvider(CodeExecutionService):
                             "version": "*",
                             "files": [{"name": str(spec["filename"]), "content": source_code}],
                             "stdin": case.stdin,
+                            # Without this the remote host's default applies, so
+                            # the scale cases stop gating complexity: an O(n^2)
+                            # solution passes or fails on a stranger's timeout
+                            # rather than the one the problem was measured for.
+                            # Piston takes milliseconds.
+                            "run_timeout": int(time_limit_for(language) * 1000),
+                            "compile_timeout": int(time_limit_for(language) * 3 * 1000),
                         },
                     )
                     response.raise_for_status()
@@ -474,6 +481,10 @@ class PistonProvider(CodeExecutionService):
                     run_stage = payload.get("run") or {}
                     stdout = run_stage.get("stdout", "")
                     exit_code = run_stage.get("code")
+                    # Piston kills an over-running program with a signal and
+                    # reports `code: null`, so the signal is the only evidence
+                    # that the limit was hit rather than the program exiting.
+                    timed_out = run_stage.get("signal") in ("SIGKILL", "SIGTERM")
                     passed = exit_code == 0 and compare_output(
                         stdout, case.expected_stdout, case.match
                     )
@@ -487,6 +498,7 @@ class PistonProvider(CodeExecutionService):
                             expected_stdout=None if case.hidden else case.expected_stdout,
                             exit_code=exit_code,
                             duration_ms=int((time.perf_counter() - started) * 1000),
+                            timed_out=timed_out,
                         )
                     )
         except httpx.HTTPError as exc:
@@ -539,7 +551,18 @@ class Judge0Provider(CodeExecutionService):
                         )
                     stdout = payload.get("stdout") or ""
                     status_id = (payload.get("status") or {}).get("id")
-                    passed = status_id == 3 or compare_output(
+                    # Judge0 status: 3 = Accepted, 4 = Wrong Answer. Those are the
+                    # only two that mean the program ran to completion; everything
+                    # else (5 = time limit, 6 = compile error, 11+ = runtime error)
+                    # is a failure however much of the expected output reached
+                    # stdout first. `or` here credited a timed-out or crashed
+                    # submission whose partial output happened to match, which is
+                    # exactly how an O(n^2) solution slips past a scale case.
+                    # Our own comparator still decides between 3 and 4, because it
+                    # honours the case's `match` mode (trimmed/tokens/exact) and
+                    # Judge0's does not.
+                    ran_to_completion = status_id in (3, 4)
+                    passed = ran_to_completion and compare_output(
                         stdout, case.expected_stdout, case.match
                     )
                     results.append(
@@ -552,6 +575,11 @@ class Judge0Provider(CodeExecutionService):
                             expected_stdout=None if case.hidden else case.expected_stdout,
                             exit_code=0 if status_id == 3 else 1,
                             duration_ms=int((time.perf_counter() - started) * 1000),
+                            # Status 5 is the time limit. Carrying it through means
+                            # the learner is told they were too slow, rather than
+                            # being shown a wrong-answer diff for output that was
+                            # on its way to being correct.
+                            timed_out=status_id == 5,
                         )
                     )
         except httpx.HTTPError as exc:

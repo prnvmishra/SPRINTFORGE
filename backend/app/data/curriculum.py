@@ -1,60 +1,57 @@
-"""Builds practice modules from the curriculum problem sets.
+"""Serves the curriculum's practice modules to the API, cheaply.
 
-The competitive-programming problems in :mod:`app.data.curriculum_cp` are pure
-data plus a reference solution. This module joins them with the verified test
-cases produced by ``scripts/build_test_cases.py`` and emits dicts in the shape
-the practice service already understands, one per (problem, language) pair.
-
-A problem is expanded across all five supported languages (Python, JavaScript,
-Java, C++, C) unless it declares its own ``languages`` list, which is how the
+One problem becomes one module per supported language (Python, JavaScript,
+Java, C++, C), unless it declares its own ``languages`` list — which is how the
 language-fundamentals problems keep a pointer-arithmetic exercise out of Python.
-Starter code is generated from the problem's ``io`` spec by
-:mod:`app.data.curriculum_starters`.
+
+Those modules are *built* by :mod:`app.data.curriculum_source`, which is far too
+expensive to import at runtime: the problem sets generate their multi-megabyte
+scale inputs from a seeded RNG at import, costing about ten seconds and a few
+hundred megabytes. So the build is done once by
+``scripts/build_curriculum_manifest.py``, and this module reads the finished
+manifest. Hidden cases stay out of the manifest too, behind
+:func:`load_hidden_cases`, because they carry that same weight and only the
+grader ever reads them.
 
 Reference solutions are deliberately *not* carried into the emitted modules, so
 there is no path by which a solution could be served to a client.
+
+The build-time names (``CP_PROBLEMS``, ``STARTERS``, ``build_cp_modules``) are
+still importable from here for the scripts that want them, and pull in the
+expensive module only at that point.
 
 Adding a problem: see ``backend/docs/curriculum_authoring.md``.
 """
 
 from __future__ import annotations
 
+import gzip
 import json
 import pathlib
+from functools import lru_cache
 from typing import Any
 
-from app.data.curriculum_basics_c import PROBLEMS as _BASICS_C
-from app.data.curriculum_basics_cpp import PROBLEMS as _BASICS_CPP
-from app.data.curriculum_basics_java import PROBLEMS as _BASICS_JAVA
-from app.data.curriculum_basics_python import PROBLEMS as _BASICS_PYTHON
-from app.data.curriculum_blind75_1 import PROBLEMS as _BLIND75_1
-from app.data.curriculum_blind75_2 import PROBLEMS as _BLIND75_2
-from app.data.curriculum_blind75_3 import PROBLEMS as _BLIND75_3
-from app.data.curriculum_blind75_4 import PROBLEMS as _BLIND75_4
-from app.data.curriculum_cp import CP_PROBLEMS as _CP_PROBLEMS
-
-CP_PROBLEMS: list[dict[str, Any]] = [
-    # Language fundamentals come first: syntax, types, control flow, strings,
-    # arrays, then pointers/classes as the language demands. A learner should
-    # not meet Blind 75 before they can write a loop in the language they are
-    # being judged in.
-    *_BASICS_C,
-    *_BASICS_CPP,
-    *_BASICS_JAVA,
-    *_BASICS_PYTHON,
-    *_CP_PROBLEMS,
-    *_BLIND75_1,
-    *_BLIND75_2,
-    *_BLIND75_3,
-    *_BLIND75_4,
-]
-
-_slugs = [problem["slug"] for problem in CP_PROBLEMS]
-if len(set(_slugs)) != len(_slugs):
-    raise RuntimeError("duplicate curriculum problem slug detected")
-from app.data.curriculum_starters import build_starters
-
+#: The authoring artifact: the whole bank in one file, written by
+#: ``scripts/build_test_cases.py`` and merged into by the verify scripts. It is
+#: deliberately *not* read at import — see :data:`CASES_VISIBLE_PATH`.
 GENERATED_CASES_PATH = pathlib.Path(__file__).parent / "generated_cases.json"
+
+#: The runtime store, derived from the bank by ``scripts/split_case_bank.py``.
+#: Visible cases are small enough to hold for every slug at once; hidden ones
+#: carry the multi-megabyte scale inputs and are loaded per slug on demand.
+CASES_DIR = pathlib.Path(__file__).parent / "cases"
+CASES_VISIBLE_PATH = CASES_DIR / "visible.json"
+CASES_HIDDEN_DIR = CASES_DIR / "hidden"
+
+#: Hidden cases are stored gzipped: they are mostly generated digits and text,
+#: which halves to 80MB, and that is the artifact a deployment has to carry.
+#: The cost is a few milliseconds per slug on first grade, paid once thanks to
+#: the cache on :func:`load_hidden_cases`.
+HIDDEN_SUFFIX = ".json.gz"
+
+#: The finished practice modules, written by
+#: ``scripts/build_curriculum_manifest.py``. This is what the API reads.
+CURRICULUM_MANIFEST_PATH = CASES_DIR / "modules.json"
 
 # User-facing tracks. These are the lanes a learner picks between; each maps
 # onto skills that already exist in the knowledge graph.
@@ -87,20 +84,69 @@ TRACKS: dict[str, dict[str, Any]] = {
 
 
 def _load_generated_cases() -> dict[str, Any]:
+    """The whole bank. For build and verify scripts only, never at import.
+
+    Streamed from the open file rather than via ``read_text`` so the decoded
+    text and the parsed structure are not both alive at the peak.
+    """
     if not GENERATED_CASES_PATH.exists():
         raise RuntimeError(
             "generated_cases.json is missing. Run: python -m scripts.build_test_cases"
         )
-    return json.loads(GENERATED_CASES_PATH.read_text())
+    with GENERATED_CASES_PATH.open("rb") as handle:
+        return json.load(handle)
 
 
-# --------------------------------------------------------------------------- #
-#  Language starters                                                          #
-# --------------------------------------------------------------------------- #
-# Starters are generated from each problem's declarative ``io`` spec rather
-# than hand-written, so adding a problem costs one spec instead of five files.
-# See :mod:`app.data.curriculum_starters` and
-# ``backend/docs/curriculum_authoring.md``.
+def _load_visible_cases() -> dict[str, Any]:
+    if not CASES_VISIBLE_PATH.exists():
+        raise RuntimeError(
+            "The runtime case store is missing. Run: "
+            "python -m scripts.build_test_cases && python -m scripts.split_case_bank"
+        )
+    with CASES_VISIBLE_PATH.open("rb") as handle:
+        return json.load(handle)
+
+
+@lru_cache(maxsize=4)
+def load_hidden_cases(slug: str) -> tuple[dict[str, Any], ...]:
+    """This slug's hidden cases, read on first use and cached.
+
+    The cache is deliberately small: a single slug's hidden cases can run to
+    tens of megabytes, so holding every slug ever graded would reintroduce the
+    footprint this split exists to remove. Four is enough for a learner
+    iterating on one problem, and bounds the worst case.
+
+    A tuple because :func:`lru_cache` hands the same object to every caller and
+    a shared mutable list would let one request corrupt the next one's cases.
+    """
+    path = CASES_HIDDEN_DIR / f"{slug}{HIDDEN_SUFFIX}"
+    if not path.exists():
+        raise RuntimeError(
+            f"No hidden cases file for '{slug}'. Run: python -m scripts.split_case_bank"
+        )
+    with gzip.open(path, "rb") as handle:
+        return tuple(json.load(handle))
+
+
+def graded_cases(module: dict[str, Any]) -> list[dict[str, Any]]:
+    """Every case a Submit is judged against, visible and hidden.
+
+    Curriculum modules carry only their visible cases in memory and name their
+    slug, so the hidden ones are fetched here. Hand-authored modules embed all
+    of their cases directly and have no slug, and pass through unchanged.
+    """
+    cases = list(module.get("test_cases", []))
+    slug = module.get("cases_slug")
+    if slug:
+        cases.extend(dict(case) for case in load_hidden_cases(slug))
+    return cases
+
+
+def hidden_case_count(module: dict[str, Any]) -> int:
+    """How many hidden cases grade this module, without loading them."""
+    embedded = sum(1 for case in module.get("test_cases", []) if case.get("hidden"))
+    return embedded + module.get("hidden_test_count", 0)
+
 
 LANGUAGE_LABELS = {
     "python": "Python",
@@ -110,58 +156,41 @@ LANGUAGE_LABELS = {
     "c": "C",
 }
 
-STARTERS: dict[str, dict[str, str]] = {
-    problem["slug"]: build_starters(problem) for problem in CP_PROBLEMS
+@lru_cache(maxsize=1)
+def _load_curriculum_modules() -> tuple[dict[str, Any], ...]:
+    if not CURRICULUM_MANIFEST_PATH.exists():
+        raise RuntimeError(
+            "The curriculum manifest is missing. Run: "
+            "python -m scripts.build_curriculum_manifest"
+        )
+    with CURRICULUM_MANIFEST_PATH.open("rb") as handle:
+        return tuple(json.load(handle))
+
+
+#: Names resolved on first access rather than at import.
+#:
+#: ``CURRICULUM_MODULES`` is deferred so that importing this module does not
+#: require the manifest to exist yet — ``scripts/build_curriculum_manifest.py``
+#: has to import its way here in order to *write* that file.
+#:
+#: The rest live in :mod:`app.data.curriculum_source`, which costs about ten
+#: seconds to import. Keeping them reachable from here means the build and
+#: verify scripts can go on importing them from their usual home, while the API,
+#: which touches none of them, never pays for it.
+_DEFERRED = {
+    "CURRICULUM_MODULES": lambda: list(_load_curriculum_modules()),
+    "CP_PROBLEMS": None,
+    "STARTERS": None,
+    "build_cp_modules": None,
 }
 
 
-def build_cp_modules() -> list[dict[str, Any]]:
-    """One practice module per (problem, language), carrying verified cases."""
-    generated = _load_generated_cases()
-    modules: list[dict[str, Any]] = []
-    seen_ids: set[str] = set()
+def __getattr__(name: str) -> Any:
+    if name not in _DEFERRED:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    loader = _DEFERRED[name]
+    if loader is not None:
+        return loader()
+    from app.data import curriculum_source
 
-    for problem in CP_PROBLEMS:
-        slug = problem["slug"]
-        entry = generated.get(slug)
-        if not entry:
-            raise RuntimeError(
-                f"No generated cases for '{slug}'. Run: python -m scripts.build_test_cases"
-            )
-        starters = STARTERS.get(slug, {})
-        if not starters:
-            raise RuntimeError(f"No starter code registered for '{slug}'")
-
-        for language, starter in starters.items():
-            module_id = f"cp-{slug}-{language}"
-            if module_id in seen_ids:
-                raise RuntimeError(f"Duplicate curriculum module id '{module_id}'")
-            seen_ids.add(module_id)
-            modules.append(
-                {
-                    "id": module_id,
-                    "track": "competitive",
-                    "kind": "challenge",
-                    "language": language,
-                    "technology": LANGUAGE_LABELS[language],
-                    "skill_id": problem["skill_id"],
-                    "title": f"{problem['title']} ({LANGUAGE_LABELS[language]})",
-                    "difficulty": problem["difficulty"],
-                    "estimated_minutes": problem["estimated_minutes"],
-                    "summary": problem["statement"],
-                    "problem_statement": problem["statement"],
-                    "constraints": problem["constraints"],
-                    "input_format": problem["input_format"],
-                    "output_format": problem["output_format"],
-                    "examples": problem["examples"],
-                    "requirements": problem["criteria"],
-                    "editable_files": ["solution"],
-                    "files": {"solution": starter},
-                    "test_cases": entry["cases"],
-                    "checks": [],
-                }
-            )
-    return modules
-
-
-CURRICULUM_MODULES: list[dict[str, Any]] = build_cp_modules()
+    return getattr(curriculum_source, name)

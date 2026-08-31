@@ -92,44 +92,44 @@ export default function PracticeWorkspacePage() {
   const [revision, setRevision] = useState(0);
   const startedAt = useRef(Date.now());
 
-  const module = moduleQuery.data;
+  const practiceModule = moduleQuery.data;
 
   useEffect(() => {
-    if (!module) return;
-    setFiles(module.files);
-    filesRef.current = module.files;
-    const first = module.editable_files[0] ?? Object.keys(module.files)[0] ?? "";
+    if (!practiceModule) return;
+    setFiles(practiceModule.files);
+    filesRef.current = practiceModule.files;
+    const first = practiceModule.editable_files[0] ?? Object.keys(practiceModule.files)[0] ?? "";
     setActiveFile(first);
     activeFileRef.current = first;
-    setWebTab(module.entry_file ? "preview" : "mentor");
+    setWebTab(practiceModule.entry_file ? "preview" : "mentor");
     setConsoleTab("testcase");
-    setStdin(module.sample_tests[0]?.stdin ?? "");
+    setStdin(practiceModule.sample_tests[0]?.stdin ?? "");
     setRevision((r) => r + 1);
     startedAt.current = Date.now();
-  }, [module]);
+  }, [practiceModule]);
 
   const editorLanguage = useMemo(() => {
-    if (!module) return "plaintext";
-    if (module.kind === "challenge") {
-      return MONACO_LANGUAGE[module.language ?? "javascript"] ?? "plaintext";
+    if (!practiceModule) return "plaintext";
+    if (practiceModule.kind === "challenge") {
+      return MONACO_LANGUAGE[practiceModule.language ?? "javascript"] ?? "plaintext";
     }
     return languageForFile(activeFile);
-  }, [module, activeFile]);
+  }, [practiceModule, activeFile]);
 
   const getCode = useCallback(() => filesRef.current[activeFileRef.current] ?? "", []);
 
   async function run(withStdin = false) {
-    if (!module) return;
+    if (!practiceModule) return;
     setBusy("run");
     setError(null);
     try {
-      const result = await api<RunResult>(`/practice/modules/${module.id}/run`, {
+      const result = await api<RunResult>(`/practice/modules/${practiceModule.id}/run`, {
         method: "POST",
         body: { files, stdin: withStdin ? stdin : null },
       });
       setRunResult(result);
       setSubmitResult(null);
-      if (result.kind === "web" && module.entry_file) setWebTab("preview");
+      if (result.kind === "web" && practiceModule.entry_file) setWebTab("preview");
       setConsoleTab("result");
     } catch (runError) {
       setError(errorMessage(runError));
@@ -140,11 +140,11 @@ export default function PracticeWorkspacePage() {
   }
 
   async function submit() {
-    if (!module) return;
+    if (!practiceModule) return;
     setBusy("submit");
     setError(null);
     try {
-      const result = await api<SubmitResult>(`/practice/modules/${module.id}/submit`, {
+      const result = await api<SubmitResult>(`/practice/modules/${practiceModule.id}/submit`, {
         method: "POST",
         body: { files, duration_seconds: (Date.now() - startedAt.current) / 1000 },
       });
@@ -168,7 +168,7 @@ export default function PracticeWorkspacePage() {
   function updateFile(file: string, value: string) {
     // Only the layer being practised is writable; provided files must stay pristine
     // so a passing submission cannot come from editing the scaffolding.
-    if (!module?.editable_files.includes(file)) return;
+    if (!practiceModule?.editable_files.includes(file)) return;
     setFiles((current) => {
       if (current[file] === value) return current;
       const next = { ...current, [file]: value };
@@ -178,9 +178,9 @@ export default function PracticeWorkspacePage() {
   }
 
   function reset() {
-    if (!module) return;
-    setFiles(module.files);
-    filesRef.current = module.files;
+    if (!practiceModule) return;
+    setFiles(practiceModule.files);
+    filesRef.current = practiceModule.files;
     setRevision((r) => r + 1);
     setRunResult(null);
     setSubmitResult(null);
@@ -191,12 +191,12 @@ export default function PracticeWorkspacePage() {
     return <WorkspaceSkeleton />;
   }
 
-  if (moduleQuery.error || !module) {
+  if (moduleQuery.error || !practiceModule) {
     return (
       <AppShell wide>
         <div className="py-10">
           <Alert tone="danger" title="Module unavailable">
-            {errorMessage(moduleQuery.error) || "Practice module not found."}
+            {errorMessage(moduleQuery.error) || "Practice practiceModule not found."}
           </Alert>
           <Link href="/practice" className="btn-ghost btn-mono mt-5 px-4 py-2">
             ← Back to practice
@@ -206,8 +206,8 @@ export default function PracticeWorkspacePage() {
     );
   }
 
-  const isWeb = module.kind === "web";
-  const editable = module.editable_files;
+  const isWeb = practiceModule.kind === "web";
+  const editable = practiceModule.editable_files;
   const readOnly = !editable.includes(activeFile);
   const checkItems: CheckResult[] = submitResult
     ? [...submitResult.static_results, ...submitResult.test_results]
@@ -218,7 +218,7 @@ export default function PracticeWorkspacePage() {
     !submitResult &&
     runResult?.custom_run === false &&
     runResult.passed_count === runResult.total_count &&
-    module.hidden_test_count > 0;
+    practiceModule.hidden_test_count > 0;
   // Kept explicit so an empty feedback block never counts as content and
   // suppresses the console's "nothing has run yet" state.
   const hasFeedback = Boolean(error || submitResult || samplesAllPassed);
@@ -234,8 +234,8 @@ export default function PracticeWorkspacePage() {
           cases are exactly where a nearly-right solution dies. */}
       {samplesAllPassed ? (
         <Alert tone="warning">
-          Samples pass. {module.hidden_test_count} hidden{" "}
-          {module.hidden_test_count === 1 ? "case" : "cases"} still decide the submission — check
+          Samples pass. {practiceModule.hidden_test_count} hidden{" "}
+          {practiceModule.hidden_test_count === 1 ? "case" : "cases"} still decide the submission — check
           the edge conditions in the constraints before you submit.
         </Alert>
       ) : null}
@@ -244,7 +244,7 @@ export default function PracticeWorkspacePage() {
         <FailureAnalysisPanel
           analysis={submitResult.failure_analysis}
           confidence={submitResult.skill.confidence}
-          currentModuleId={module.id}
+          currentModuleId={practiceModule.id}
         />
       ) : null}
     </>
@@ -255,7 +255,7 @@ export default function PracticeWorkspacePage() {
   const editorPane = (
     <div className="flex h-[440px] min-h-0 flex-col bg-canvas lg:h-full">
       <div className="flex flex-none items-center gap-3 border-b border-line bg-surface px-3 py-1.5">
-        <LanguageSelect language={module.language} />
+        <LanguageSelect language={practiceModule.language} />
         {readOnly ? <Badge tone="warning">read only</Badge> : null}
         <span className="ml-auto truncate font-mono text-[9.5px] uppercase tracking-[0.1em] text-faint">
           {activeFile}
@@ -273,7 +273,7 @@ export default function PracticeWorkspacePage() {
 
       <div className="min-h-0 flex-1">
         <CodeEditor
-          path={`${module.id}/r${revision}/${activeFile}`}
+          path={`${practiceModule.id}/r${revision}/${activeFile}`}
           value={files[activeFile] ?? ""}
           language={editorLanguage}
           readOnly={readOnly}
@@ -301,16 +301,16 @@ export default function PracticeWorkspacePage() {
             ← Practice
           </Link>
           <span className="h-3 w-px bg-line" />
-          <h1 className="min-w-0 truncate text-[13px] font-medium text-ink">{module.title}</h1>
+          <h1 className="min-w-0 truncate text-[13px] font-medium text-ink">{practiceModule.title}</h1>
 
           <div className="flex flex-wrap items-center gap-1.5">
-            <Badge tone="accent">{module.technology}</Badge>
+            <Badge tone="accent">{practiceModule.technology}</Badge>
             <Badge>
-              {difficultyLabel(module.difficulty)} L{module.difficulty}
+              {difficultyLabel(practiceModule.difficulty)} L{practiceModule.difficulty}
             </Badge>
-            <Badge>{module.skill_name}</Badge>
-            <Badge tone="success">+{module.xp_reward} XP</Badge>
-            {module.is_remediation ? <Badge tone="warning">remediation</Badge> : null}
+            <Badge>{practiceModule.skill_name}</Badge>
+            <Badge tone="success">+{practiceModule.xp_reward} XP</Badge>
+            {practiceModule.is_remediation ? <Badge tone="warning">remediation</Badge> : null}
           </div>
 
           <div className="ml-auto flex flex-wrap items-center gap-2">
@@ -323,8 +323,8 @@ export default function PracticeWorkspacePage() {
               </button>
             ) : (
               <TestTally
-                samples={module.sample_tests.length}
-                hidden={module.hidden_test_count}
+                samples={practiceModule.sample_tests.length}
+                hidden={practiceModule.hidden_test_count}
                 passed={runResult?.passed_count}
                 total={runResult?.total_count}
                 customRun={runResult?.custom_run}
@@ -351,8 +351,8 @@ export default function PracticeWorkspacePage() {
               title={
                 isWeb
                   ? "Renders your code and runs the visible checks. Nothing is graded."
-                  : `Executes the ${module.sample_tests.length} sample case${
-                      module.sample_tests.length === 1 ? "" : "s"
+                  : `Executes the ${practiceModule.sample_tests.length} sample case${
+                      practiceModule.sample_tests.length === 1 ? "" : "s"
                     } only. Nothing is graded.`
               }
               className="btn-subtle btn-mono gap-1.5 px-3.5 py-1.5"
@@ -362,17 +362,17 @@ export default function PracticeWorkspacePage() {
               <span className="normal-case tracking-normal text-faint">
                 {isWeb
                   ? "preview"
-                  : `${module.sample_tests.length} sample${
-                      module.sample_tests.length === 1 ? "" : "s"
+                  : `${practiceModule.sample_tests.length} sample${
+                      practiceModule.sample_tests.length === 1 ? "" : "s"
                     }`}
               </span>
             </button>
             <button
               onClick={() => void submit()}
               title={
-                module.hidden_test_count > 0
-                  ? `Grades every case, including ${module.hidden_test_count} hidden one${
-                      module.hidden_test_count === 1 ? "" : "s"
+                practiceModule.hidden_test_count > 0
+                  ? `Grades every case, including ${practiceModule.hidden_test_count} hidden one${
+                      practiceModule.hidden_test_count === 1 ? "" : "s"
                     } you cannot see, and updates your twin.`
                   : "Grades the attempt and updates your twin."
               }
@@ -381,8 +381,8 @@ export default function PracticeWorkspacePage() {
             >
               {busy === "submit" ? "Verifying…" : "Submit"}
               <span className="normal-case tracking-normal text-accent-ink/60">
-                {module.hidden_test_count > 0
-                  ? `+${module.hidden_test_count} hidden`
+                {practiceModule.hidden_test_count > 0
+                  ? `+${practiceModule.hidden_test_count} hidden`
                   : "graded"}
               </span>
             </button>
@@ -400,7 +400,7 @@ export default function PracticeWorkspacePage() {
               showBrief ? "block" : "hidden",
             )}
           >
-            <Brief module={module} checks={checkItems} />
+            <Brief module={practiceModule} checks={checkItems} />
           </aside>
 
           {/* CENTER — editor over output dock */}
@@ -413,7 +413,7 @@ export default function PracticeWorkspacePage() {
             />
             <div className="min-h-[300px] flex-1 xl:min-h-0">
               <CodeEditor
-                path={`${module.id}/r${revision}/${activeFile}`}
+                path={`${practiceModule.id}/r${revision}/${activeFile}`}
                 value={files[activeFile] ?? ""}
                 language={editorLanguage}
                 readOnly={readOnly}
@@ -452,7 +452,7 @@ export default function PracticeWorkspacePage() {
           <aside className="flex min-h-0 flex-col bg-surface">
             <div className="flex flex-none border-b border-line">
               {(["preview", "mentor", "community"] as const)
-                .filter((item) => item !== "preview" || module.entry_file)
+                .filter((item) => item !== "preview" || practiceModule.entry_file)
                 .map((item) => (
                   <button
                     key={item}
@@ -475,20 +475,20 @@ export default function PracticeWorkspacePage() {
             </div>
 
             <div className="min-h-[280px] flex-1 overflow-y-auto xl:min-h-0">
-              {webTab === "preview" && module.entry_file ? (
+              {webTab === "preview" && practiceModule.entry_file ? (
                 <div className="h-full min-h-[280px]">
                   <PreviewFrame html={runResult?.preview ?? null} />
                 </div>
               ) : webTab === "community" ? (
                 <div className="p-4">
-                  <CommunityPanel moduleId={module.id} />
+                  <CommunityPanel moduleId={practiceModule.id} />
                 </div>
               ) : (
                 <div className="h-full p-4">
                   <MentorPanel
-                    skillId={module.skill_id}
-                    skillName={module.skill_name}
-                    moduleId={module.id}
+                    skillId={practiceModule.skill_id}
+                    skillName={practiceModule.skill_name}
+                    moduleId={practiceModule.id}
                     getCode={getCode}
                     failingChecks={failingChecks}
                   />
@@ -508,7 +508,7 @@ export default function PracticeWorkspacePage() {
           className="mx-auto max-w-[1800px] bg-line lg:h-[calc(100vh-6.5rem)]"
           first={
             <ProblemPanel
-              module={module}
+              module={practiceModule}
               checks={checkItems}
               failingChecks={failingChecks}
               getCode={getCode}
@@ -526,7 +526,7 @@ export default function PracticeWorkspacePage() {
               second={
                 <div className="h-[320px] min-h-0 lg:h-full">
                   <TestConsole
-                    module={module}
+                    module={practiceModule}
                     tab={consoleTab}
                     onTabChange={setConsoleTab}
                     stdin={stdin}

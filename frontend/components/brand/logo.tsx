@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * Face polygons were precomputed on a 48-unit grid; blocks are painted back to
  * front so adjacent faces occlude correctly and the staircase reads as one solid.
  */
-export function LogoMark({
+function LogoMark({
   className,
   animated = false,
   /** Namespaces gradient ids when several marks share a document. */

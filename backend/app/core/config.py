@@ -3,6 +3,10 @@ from typing import List
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+#: Kept as a constant so the production check compares against the same literal
+#: the field defaults to, rather than a copy that can drift out of step.
+UNSAFE_DEFAULT_AUTH_SECRET = "dev-only-insecure-secret-change-me"
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -12,7 +16,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "sqlite:///./sprintforge.db"
 
-    AUTH_SECRET: str = "dev-only-insecure-secret-change-me"
+    AUTH_SECRET: str = UNSAFE_DEFAULT_AUTH_SECRET
     AUTH_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
 
@@ -51,6 +55,61 @@ class Settings(BaseSettings):
     @property
     def cors_origins_list(self) -> List[str]:
         return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT.lower() == "production"
+
+    @property
+    def cors_origin_regex_effective(self) -> str:
+        """The any-localhost allowance is a development convenience only.
+
+        Left on in production it lets a page served from the deployer's own
+        machine make credentialed calls to the live API, which is not something
+        the origin list would otherwise permit.
+        """
+        return "" if self.is_production else self.CORS_ORIGIN_REGEX
+
+    @property
+    def sandboxed_execution(self) -> bool:
+        """Whether learner code runs somewhere it cannot reach this process.
+
+        `local` runs it as a subprocess of the API under the same user, which is
+        fine on a laptop and unacceptable on a public host — it is arbitrary
+        remote code execution by design. See `LocalSubprocessProvider`.
+        """
+        return self.CODE_EXECUTION_PROVIDER.lower() in {"piston", "judge0"}
+
+    def production_blockers(self) -> List[str]:
+        """Settings that are safe in development and dangerous on a public host.
+
+        Returned as a list rather than raising here so startup can report every
+        problem at once instead of one per redeploy.
+        """
+        if not self.is_production:
+            return []
+
+        blockers: List[str] = []
+        if self.AUTH_SECRET == UNSAFE_DEFAULT_AUTH_SECRET:
+            blockers.append(
+                "AUTH_SECRET is still the development default, so anyone who has "
+                "read this repository can mint a token for any account. Set it to "
+                "a long random value."
+            )
+        if not self.sandboxed_execution:
+            blockers.append(
+                f"CODE_EXECUTION_PROVIDER is '{self.CODE_EXECUTION_PROVIDER}', which "
+                "runs learner-submitted code as this process. Set it to 'piston' or "
+                "'judge0' before exposing the API."
+            )
+        if self.CODE_EXECUTION_PROVIDER.lower() == "judge0" and not self.JUDGE0_API_KEY:
+            blockers.append("CODE_EXECUTION_PROVIDER is 'judge0' but JUDGE0_API_KEY is empty.")
+        if self.DATABASE_URL.startswith("sqlite"):
+            blockers.append(
+                "DATABASE_URL is SQLite, which loses every learner's progress when "
+                "the container restarts."
+            )
+        return blockers
 
     @property
     def render_assembly_debug_enabled(self) -> bool:

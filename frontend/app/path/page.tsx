@@ -123,14 +123,25 @@ export default function LearningPathPage() {
           </div>
         }
         actions={
-          goal.path_id && goal.next_course_id ? (
-            <Link
-              href={`/paths/${goal.path_id}/courses/${goal.next_course_id}`}
-              className="btn-ghost btn-mono px-4 py-2"
-            >
-              Next course
+          <div className="flex flex-wrap items-center gap-2">
+            {/* The catalogue lives here rather than in the top bar: browsing
+                tracks is how you change the goal this whole route hangs off. */}
+            <Link href="/paths" className="btn-ghost btn-mono px-4 py-2">
+              Career tracks
             </Link>
-          ) : null
+            {/* The answer to "but I want to learn something you don't teach". */}
+            <Link href="/roadmap" className="btn-ghost btn-mono px-4 py-2">
+              Learn something else
+            </Link>
+            {goal.path_id && goal.next_course_id ? (
+              <Link
+                href={`/paths/${goal.path_id}/courses/${goal.next_course_id}`}
+                className="btn-ghost btn-mono px-4 py-2"
+              >
+                Next course
+              </Link>
+            ) : null}
+          </div>
         }
       />
 
@@ -147,9 +158,20 @@ export default function LearningPathPage() {
               <Counter value={verifiedCount} />
               <span className="text-faint"> / {totalCount}</span>
             </p>
-            <p className="font-mono text-[11px] tabular-nums text-muted">
-              <Counter value={progress.percent} decimals={0} suffix="%" /> of the route verified
-            </p>
+            <div className="text-right font-mono text-[11px] tabular-nums text-muted">
+              <p>
+                <Counter value={progress.percent} decimals={0} suffix="%" /> of the route verified
+              </p>
+              {/* Kept distinct from the line above: partial progress across many
+                  skills is real information, but it is not verification. Omitted
+                  rather than defaulted when absent — "0% average confidence"
+                  would read as a measurement instead of a missing one. */}
+              {typeof progress.mean_confidence === "number" ? (
+                <p className="mt-1 text-faint">
+                  {progress.mean_confidence.toFixed(0)}% average confidence
+                </p>
+              ) : null}
+            </div>
           </div>
           <GrowBar
             value={progress.percent}

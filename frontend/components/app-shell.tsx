@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 
 import { Logo } from "@/components/brand/logo";
 import { Avatar } from "@/components/ui/avatar";
@@ -10,16 +10,37 @@ import { Loader } from "@/components/ui/primitives";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
+/**
+ * Ordered as the engine loop runs, not alphabetically or by page age:
+ *
+ *   verify → diagnose → personalise → build → progress
+ *
+ * Dashboard sits alone at the head as the command centre you return to between
+ * stages. The groups are separated in the bar so the reading order is visible
+ * rather than implied by position alone.
+ *
+ * The career catalogue at `/paths` is deliberately absent. It used to sit next
+ * to `/path` as "Paths" beside "My Path", which are different things one letter
+ * apart — the catalogue of tracks versus this learner's generated route. It is
+ * reached from inside My Path instead, where choosing a goal belongs.
+ */
 const NAV = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/path", label: "My Path" },
-  { href: "/paths", label: "Paths" },
-  { href: "/practice", label: "Practice" },
-  { href: "/projects", label: "Projects" },
-  { href: "/assessment", label: "Skills" },
-  { href: "/profile", label: "Twin" },
-  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/dashboard", label: "Dashboard", group: "home" },
+  { href: "/assessment", label: "Verify", group: "know" },
+  { href: "/profile", label: "Twin", group: "know" },
+  { href: "/path", label: "My Path", group: "know" },
+  { href: "/practice", label: "Practice", group: "build" },
+  { href: "/projects", label: "Projects", group: "build" },
+  { href: "/leaderboard", label: "Leaderboard", group: "progress" },
 ];
+
+/** Names the stage each nav group belongs to. Shown in the mobile drawer,
+ *  where there is room for words instead of a separator rule. */
+const GROUP_LABEL: Record<string, string> = {
+  know: "What the engine knows",
+  build: "Where you build it",
+  progress: "Progress",
+};
 
 /** Re-exported so existing imports from the shell keep working. */
 export { Logo };
@@ -108,12 +129,16 @@ export function AppShell({
           </Link>
 
           <nav className="ml-2 hidden items-center lg:flex">
-            {NAV.map((item) => {
+            {NAV.map((item, index) => {
               const active =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const startsGroup = index > 0 && NAV[index - 1].group !== item.group;
               return (
+                <Fragment key={item.href}>
+                  {startsGroup ? (
+                    <span className="mx-2 h-3 w-px flex-none bg-line-strong" aria-hidden />
+                  ) : null}
                 <Link
-                  key={item.href}
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
@@ -131,6 +156,7 @@ export function AppShell({
                     aria-hidden
                   />
                 </Link>
+                </Fragment>
               );
             })}
           </nav>
@@ -195,11 +221,15 @@ export function AppShell({
         )}
       >
         <nav className="flex flex-col px-4 py-3">
-          {NAV.map((item) => {
+          {NAV.map((item, index) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const startsGroup = index === 0 || NAV[index - 1].group !== item.group;
             return (
+              <Fragment key={item.href}>
+                {startsGroup && GROUP_LABEL[item.group] ? (
+                  <p className="label mt-4 first:mt-1 pb-1 text-faint">{GROUP_LABEL[item.group]}</p>
+                ) : null}
               <Link
-                key={item.href}
                 href={item.href}
                 className={cn(
                   "flex items-center justify-between border-b border-line/60 py-3 font-mono text-[12px] uppercase tracking-[0.1em] last:border-0",
@@ -209,6 +239,7 @@ export function AppShell({
                 {item.label}
                 {active ? <span className="text-[9px]">●</span> : null}
               </Link>
+              </Fragment>
             );
           })}
           <Link

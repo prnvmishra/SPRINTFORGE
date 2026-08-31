@@ -92,7 +92,7 @@ export function ProblemPanel({
 }
 
 /** The statement itself: title, tags, prose, constraints, format, examples. */
-export function ProblemDescription({
+function ProblemDescription({
   module,
   checks,
 }: {

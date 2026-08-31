@@ -300,6 +300,42 @@ def test_execution_milestones_empty_without_project():
     assert lps.learning_path(db, twin)["execution_milestones"] == []
 
 
+# ----------------------------------------------------------------- progress
+#
+# `percent` used to be the mean confidence across the route while both clients
+# labelled it "% of the route verified", so a learner just under the threshold
+# on every skill was told they had verified a chunk of a route with nothing
+# verified on it. These pin the two numbers to their names.
+
+
+def test_percent_counts_verified_skills_not_mean_confidence():
+    db = build_session()
+    _, twin = seed_learner(db)
+    progress = lps.learning_path(db, twin)["progress"]
+    expected = round(progress["skills_verified"] / progress["skills_total"] * 100, 1)
+    assert progress["percent"] == expected
+
+
+def test_percent_is_zero_while_nothing_is_verified():
+    db = build_session()
+    _, twin = seed_learner(db)
+    progress = lps.learning_path(db, twin)["progress"]
+    if progress["skills_verified"] == 0:
+        assert progress["percent"] == 0.0
+        # The seed has partial evidence, so the mean must not also be zero —
+        # otherwise this test would pass against the old implementation too.
+        assert progress["mean_confidence"] > 0
+
+
+def test_mean_confidence_is_reported_separately():
+    db = build_session()
+    _, twin = seed_learner(db)
+    payload = lps.learning_path(db, twin)
+    steps = payload["path"]
+    expected = round(sum(s["confidence"] for s in steps) / len(steps), 1)
+    assert payload["progress"]["mean_confidence"] == expected
+
+
 # -------------------------------------------------------------- adaptations
 
 

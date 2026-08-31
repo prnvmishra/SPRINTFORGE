@@ -104,7 +104,6 @@ export type DigitalTwin = {
   consistency_score: number;
   learning_velocity: number;
   avg_completion_seconds: number;
-  preferred_difficulty: number;
   completed_projects: number;
   repeated_mistakes: Record<string, number>;
   active_project_id: string | null;
@@ -692,8 +691,17 @@ export type GraphNode = {
 
 /* ------------------------------------------------------------------ learning path */
 
-/** Where a skill sits on the learner's route. `locked` means a prerequisite is unmet. */
-export type PathSkillState = "verified" | "in_progress" | "not_started" | "locked";
+/**
+ * Where a skill sits on the learner's route. `locked` means a prerequisite is
+ * unmet; `needs_work` means it is unlocked but carries weak concepts or an open
+ * failure, so it is the state that most needs a visible label.
+ */
+export type PathSkillState =
+  | "verified"
+  | "in_progress"
+  | "needs_work"
+  | "not_started"
+  | "locked";
 
 export type LearningResource = {
   kind: "interactive_practice" | "challenge" | "assessment" | "course_lesson" | "concept_guide" | "documentation";
@@ -768,7 +776,7 @@ export type LearningMilestone = {
   kind: "learning" | "execution";
   path_id: string | null;
   course_id: string | null;
-  status: "complete" | "in_progress" | "not_started" | "locked";
+  status: "completed" | "in_progress" | "not_started" | "locked";
   skills: {
     skill_id: string;
     skill_name: string;
@@ -790,7 +798,18 @@ export type NextAction = Recommendation & {
 export type LearningPath = {
   goal: LearningPathGoal;
   confidence_threshold: number;
-  progress: { skills_total: number; skills_verified: number; percent: number };
+  progress: {
+    skills_total: number;
+    skills_verified: number;
+    /** Share of the route actually verified, not the mean confidence. */
+    percent: number;
+    /**
+     * Optional because a server predating this field simply omits it, and a
+     * required type here crashed the page rather than degrading. Absent means
+     * "not reported", which is not the same as zero.
+     */
+    mean_confidence?: number;
+  };
   path: LearningPathStep[];
   milestones: LearningMilestone[];
   execution_milestones: LearningMilestone[];
@@ -834,4 +853,58 @@ export type AdaptationEvent = {
 export type Adaptations = {
   events: AdaptationEvent[];
   confidence_history_available_from: string;
+};
+
+/* --------------------------------------------------------------------- roadmaps */
+
+export type RoadmapResource = {
+  kind: "video" | "search" | "doc";
+  title: string;
+  channel: string;
+  url: string;
+};
+
+export type RoadmapStep = {
+  title: string;
+  objective: string;
+  resources: RoadmapResource[];
+  children?: RoadmapStep[];
+};
+
+export type RoadmapPrerequisite = {
+  skill_id: string;
+  skill_name: string;
+  /** null when the skill has never been measured, which is not the same as 0. */
+  confidence: number | null;
+  verified: boolean;
+  graded_here: boolean;
+};
+
+export type RoadmapSummary = {
+  id: string;
+  label: string;
+  summary: string;
+  step_count: number;
+  prerequisite_ids: string[];
+};
+
+export type Roadmap = {
+  id: string;
+  label: string;
+  summary: string;
+  why: string;
+  course: RoadmapResource | null;
+  steps: RoadmapStep[];
+  prerequisites: RoadmapPrerequisite[];
+  unmet_prerequisites: RoadmapPrerequisite[];
+  graded: false;
+  disclaimer: string;
+};
+
+export type RoadmapResolution = {
+  outcome: "graded_skill" | "roadmap" | "unknown";
+  skill_id: string | null;
+  skill_name: string | null;
+  roadmap: Roadmap | null;
+  available?: RoadmapSummary[];
 };

@@ -40,7 +40,7 @@ export function composeProjectFiles(
 }
 
 /** Entry document for a file map, or null when there is nothing to render. */
-export function previewEntry(files: Record<string, string>): string | null {
+function previewEntry(files: Record<string, string>): string | null {
   const names = Object.keys(files);
   if (names.includes("index.html")) return "index.html";
   return names.find((name) => HTML_EXTENSIONS.test(name)) ?? null;

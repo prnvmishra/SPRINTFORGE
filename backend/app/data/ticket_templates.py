@@ -2253,23 +2253,28 @@ TICKET_TEMPLATES: dict[str, list[dict[str, Any]]] = {
                 "The module exposes named per-endpoint functions and touches no DOM",
             ],
             "estimated_minutes": 30,
-            "files": ["script.js"],
-            "solution_files": {"script.js": API_CLIENT_SOLUTION},
+            "files": ["api.js"],
+            "solution_files": {"api.js": API_CLIENT_SOLUTION},
             "checks": [
-                {"id": "syntax", "type": "js_syntax", "file": "script.js", "label": "script.js is valid JavaScript", "concept": "syntax", "requirement_index": None, "precondition": True},
-                {"id": "fetch", "type": "js_calls", "file": "script.js", "callee": "fetch", "label": "Calls fetch", "concept": "fetch", "hint": "The word 'fetch' in a comment or string does not count — call it.", "requirement_index": 0},
-                {"id": "ok_branch", "type": "js_ok_before_parse", "file": "script.js", "label": "Branches on response status before parsing", "concept": "HTTP status codes", "requirement_indexes": [1, 2]},
-                {"id": "error_carries_status", "type": "regex", "file": "script.js", "pattern": r"(?:throw\s+new\s+\w*Error|new\s+\w*Error\s*\()[\s\S]{0,200}?response\s*\.\s*status", "label": "The non-ok error carries the HTTP status", "concept": "HTTP status codes", "hint": "`throw new Error(`Request failed with status ${response.status}`)` — \"something went wrong\" is not debuggable.", "requirement_index": 1},
-                {"id": "handles_error", "type": "js_catch_handles", "file": "script.js", "label": "Surfaces errors rather than swallowing them", "concept": "promise rejection", "hint": "catch must bind the error and do something with it — rethrow, return it, or show it.", "requirement_index": 3},
-                {"id": "try_wraps_fetch", "type": "js_try_catch_await", "file": "script.js", "callee": "fetch", "require_binding": True, "label": "The fetch call itself runs inside try/catch (error)", "concept": "try/catch", "hint": "fetch rejects when the request never completes. response.ok never gets a chance to be false.", "requirement_index": 3},
-                {"id": "base_url", "type": "regex", "file": "script.js", "pattern": r"(?:const|let)\s+[A-Z_]{3,}\w*\s*=\s*[\"'`][^\"'`]*/[^\"'`]*[\"'`]", "label": "A base-URL constant is declared", "concept": "modules", "hint": "`const BASE_URL = \"/api\";` — one edit when the API moves, not fifteen.", "requirement_index": 4},
+                {"id": "syntax", "type": "js_syntax", "file": "api.js", "label": "script.js is valid JavaScript", "concept": "syntax", "requirement_index": None, "precondition": True},
+                {"id": "fetch", "type": "js_calls", "file": "api.js", "callee": "fetch", "label": "Calls fetch", "concept": "fetch", "hint": "The word 'fetch' in a comment or string does not count — call it.", "requirement_index": 0},
+                {"id": "ok_branch", "type": "js_ok_before_parse", "file": "api.js", "label": "Branches on response status before parsing", "concept": "HTTP status codes", "requirement_indexes": [1, 2]},
+                {"id": "error_carries_status", "type": "regex", "file": "api.js", "pattern": r"(?:throw\s+new\s+\w*Error|new\s+\w*Error\s*\()[\s\S]{0,200}?response\s*\.\s*status", "label": "The non-ok error carries the HTTP status", "concept": "HTTP status codes", "hint": "`throw new Error(`Request failed with status ${response.status}`)` — \"something went wrong\" is not debuggable.", "requirement_index": 1},
+                {"id": "handles_error", "type": "js_catch_handles", "file": "api.js", "label": "Surfaces errors rather than swallowing them", "concept": "promise rejection", "hint": "catch must bind the error and do something with it — rethrow, return it, or show it.", "requirement_index": 3},
+                {"id": "try_wraps_fetch", "type": "js_try_catch_await", "file": "api.js", "callee": "fetch", "require_binding": True, "label": "The fetch call itself runs inside try/catch (error)", "concept": "try/catch", "hint": "fetch rejects when the request never completes. response.ok never gets a chance to be false.", "requirement_index": 3},
+                {"id": "base_url", "type": "regex", "file": "api.js", "pattern": r"(?:const|let)\s+[A-Z_]{3,}\w*\s*=\s*[\"'`][^\"'`]*/[^\"'`]*[\"'`]", "label": "A base-URL constant is declared", "concept": "modules", "hint": "`const BASE_URL = \"/api\";` — one edit when the API moves, not fifteen.", "requirement_index": 4},
                                 # Three *functions*, not three bindings: `const response = ...`
                 # inside one giant loader used to satisfy this.
-                {"id": "endpoint_functions", "type": "regex", "file": "script.js", "pattern": r"(?:(?:async\s+)?function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>)[\s\S]*?(?:(?:async\s+)?function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>)[\s\S]*?(?:(?:async\s+)?function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>)", "label": "The client is split into a request helper plus per-endpoint functions", "concept": "modules", "hint": "One function that takes a path is not a client — give each endpoint a name.", "requirement_index": 5},
-                {"id": "list_endpoint", "type": "regex", "file": "script.js", "ignore_case": True, "pattern": r"(?:async\s+)?function\s+(?:list|getAll|fetchAll|load)\w*\s*\(|(?:const|let)\s+(?:list|getAll|fetchAll|load)\w*\s*=\s*(?:async\s*)?\(", "label": "A collection endpoint function exists", "concept": "modules", "hint": "Name it for the endpoint, e.g. `async function listItems()`.", "requirement_index": 5},
-                {"id": "detail_endpoint", "type": "regex", "file": "script.js", "ignore_case": True, "pattern": r"(?:async\s+)?function\s+(?:get|find|fetch|show)\w*\s*\(\s*\w+|(?:const|let)\s+(?:get|find|fetch|show)\w*\s*=\s*(?:async\s*)?\(\s*\w+", "label": "A single-item endpoint function taking an id exists", "concept": "modules", "requirement_index": 5},
-                {"id": "no_dom", "type": "not_regex", "file": "script.js", "pattern": r"(?:document\s*\.|innerHTML|textContent|innerText|querySelector)", "label": "The client never touches the DOM", "concept": "separation of concerns", "hint": "Return the data and let the caller render it — that is what makes this file reusable.", "requirement_index": 6},
-                {"id": "no_dead_code", "type": "js_no_unreachable", "file": "script.js", "label": "No unreachable error handling", "concept": "control flow", "requirement_index": None},
+                {"id": "endpoint_functions", "type": "regex", "file": "api.js", "pattern": r"(?:(?:async\s+)?function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>)[\s\S]*?(?:(?:async\s+)?function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>)[\s\S]*?(?:(?:async\s+)?function\s+\w+|(?:const|let)\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>)", "label": "The client is split into a request helper plus per-endpoint functions", "concept": "modules", "hint": "One function that takes a path is not a client — give each endpoint a name.", "requirement_index": 5},
+                # Shape, not vocabulary. The old pair of regexes accepted only
+                # `list|getAll|fetchAll|load…` for the collection, so the most
+                # obvious name a learner reaches for — `fetchRecipes()` — failed
+                # while an unrelated `loadMovies()` left in the file passed. What
+                # actually distinguishes the two endpoints is their arity: a
+                # collection call takes no id, a detail call takes one.
+                {"id": "endpoint_pair", "type": "js_endpoint_pair", "file": "api.js", "label": "A collection endpoint and a single-item endpoint both exist", "concept": "modules", "hint": "Two named functions that reach the API: one with no parameters for the collection, one taking an id for a single {entity}.", "requirement_index": 5},
+                {"id": "no_dom", "type": "not_regex", "file": "api.js", "pattern": r"(?:document\s*\.|innerHTML|textContent|innerText|querySelector)", "label": "The client never touches the DOM", "concept": "separation of concerns", "hint": "Return the data and let the caller render it — that is what makes this file reusable.", "requirement_index": 6},
+                {"id": "no_dead_code", "type": "js_no_unreachable", "file": "api.js", "label": "No unreachable error handling", "concept": "control flow", "requirement_index": None},
             ],
         }
     ],
@@ -2372,7 +2377,10 @@ TICKET_TEMPLATES: dict[str, list[dict[str, Any]]] = {
             "checks": [
                 {"id": "syntax", "type": "js_syntax", "file": "App.jsx", "label": "App.jsx is valid JavaScript/JSX", "concept": "syntax", "requirement_index": None, "precondition": True},
                 {"id": "usestate", "type": "js_calls", "file": "App.jsx", "callee": "useState", "label": "Calls useState", "concept": "useState", "requirement_index": 0},
-                {"id": "selection_state", "type": "regex", "file": "App.jsx", "pattern": r"const\s*\[\s*\w*[Ss]elect\w*\s*,\s*set\w+\s*\]\s*=\s*useState", "label": "A selection state pair is destructured from useState", "concept": "useState", "hint": "`const [selected, setSelected] = useState(null);` in App, not in the card.", "requirement_index": 0},
+                # What the selection state *is* comes from `selection_prop`,
+                # `aria_pressed` and `conditional_class` below; this check only has
+                # to establish that a real useState pair exists.
+                {"id": "selection_state", "type": "js_state_pair", "file": "App.jsx", "callee": "useState", "label": "A selection state pair is destructured from useState", "concept": "useState", "hint": "`const [selected, setSelected] = useState(null);` in App, not in the card.", "requirement_index": 0},
                 {"id": "handler_prop", "type": "regex", "file": "App.jsx", "pattern": r"on[A-Z]\w*\s*=\s*\{", "label": "Passes a handler down as an on* prop", "concept": "lifting state", "requirement_index": 1},
                 {"id": "selection_prop", "type": "regex", "file": "App.jsx", "pattern": r"(?:isSelected|selected)\s*=\s*\{", "label": "The selected flag is passed down as a prop", "concept": "props", "hint": "The card should not work out whether it is selected — tell it.", "requirement_index": 1},
                 {"id": "no_mutation", "type": "not_regex", "file": "App.jsx", "pattern": r"(?:\bstate\s*\.\s*\w+\s*=\s*[^=]|\.push\s*\(|\.splice\s*\(|\.pop\s*\(|\.shift\s*\()", "label": "Does not mutate state directly", "concept": "immutability", "hint": "push() keeps the same array reference, so React sees no change and skips the re-render.", "requirement_index": 2},
@@ -2435,6 +2443,12 @@ TICKET_TEMPLATES: dict[str, list[dict[str, Any]]] = {
                 {"id": "ok_before_parse", "type": "js_ok_before_parse", "file": "App.jsx", "label": "Checks response.ok before parsing the body", "concept": "HTTP status codes", "hint": "fetch does not reject on a 500 — the body would parse as an error page.", "requirement_index": 1},
                 {"id": "try_catch", "type": "js_try_catch_await", "file": "App.jsx", "require_binding": True, "label": "Handles request failures with try/catch (error)", "concept": "promise rejection", "requirement_index": 1},
                 {"id": "catch_handles", "type": "js_catch_handles", "file": "App.jsx", "label": "The catch block acts on the caught error", "concept": "promise rejection", "requirement_index": 1},
+                # `error_state` proves the state exists and `error_ui` proves the
+                # alert branch exists; neither proves they are connected. Without
+                # this, `console.error(err)` in the catch passed every check while
+                # leaving the error UI unreachable — exactly the anti-pattern the
+                # brief opens by warning about.
+                {"id": "catch_sets_error_state", "type": "js_catch_sets_state", "file": "App.jsx", "label": "The failure is recorded in state, not just logged", "concept": "loading/error states", "hint": "`console.error(error)` shows nobody anything. `setError(error.message)` is what makes the alert render.", "requirement_index": 1},
                 {"id": "cleanup", "type": "regex", "file": "App.jsx", "pattern": r"return\s*\(\s*\)\s*=>", "label": "The effect returns a cleanup function", "concept": "cleanup", "hint": "`return () => controller.abort();` — without it a slow response can overwrite a fresh one.", "requirement_index": 2},
                 {"id": "abort_controller", "type": "regex", "file": "App.jsx", "pattern": r"(?:new\s+AbortController|\bignore\s*=\s*true)", "label": "The in-flight request is actually cancelled", "concept": "cleanup", "requirement_index": 2},
                 {"id": "abort_signal_passed", "type": "regex", "file": "App.jsx", "pattern": r"signal\s*:\s*\w+(?:\.\w+)*|\bignore\b", "label": "The abort signal is handed to fetch", "concept": "cleanup", "hint": "Creating a controller and never passing `{ signal: controller.signal }` cancels nothing.", "requirement_index": 2},
@@ -2473,7 +2487,12 @@ TICKET_TEMPLATES: dict[str, list[dict[str, Any]]] = {
                 {"id": "listen", "type": "regex", "file": "server.js", "pattern": r"\.listen\(", "label": "Server calls listen()", "concept": "runtime", "requirement_index": 0},
                 {"id": "env_port", "type": "regex", "file": "server.js", "pattern": r"process\.env", "label": "Reads the port from process.env", "concept": "modules", "requirement_index": 2},
                 {"id": "health", "type": "regex", "file": "server.js", "pattern": r"[\"']/health[\"']", "label": "Defines a /health route", "concept": "routes", "requirement_index": 1},
-                {"id": "json", "type": "regex", "file": "server.js", "pattern": r"(res\.json|application/json)", "label": "Responds with JSON", "concept": "routes", "requirement_index": 1},
+                # Any response object, not one spelled `res`: naming the handler
+                # parameter `response` — as every other ticket in this project
+                # does — used to fail this. `express.json()` is the body-parsing
+                # middleware already in the starter, so it is excluded; matching
+                # it would have let the untouched starter pass.
+                {"id": "json", "type": "regex", "file": "server.js", "pattern": r"(?<!express)\.json\s*\(|application/json", "label": "Responds with JSON", "concept": "routes", "requirement_index": 1},
             ],
         }
     ],
@@ -2500,9 +2519,15 @@ TICKET_TEMPLATES: dict[str, list[dict[str, Any]]] = {
                 {"id": "list_route", "type": "regex", "file": "server.js", "pattern": r"get\(\s*[\"']/api/\w+[\"']", "label": "Collection route exists", "concept": "routes", "requirement_index": 0},
                 {"id": "detail_route", "type": "regex", "file": "server.js", "pattern": r"get\(\s*[\"']/api/\w+/:\w+[\"']", "label": "Detail route with a path param exists", "concept": "routes", "requirement_index": 1},
                 {"id": "post_route", "type": "regex", "file": "server.js", "pattern": r"post\(\s*[\"']/api/\w+[\"']", "label": "Create route exists", "concept": "routes", "requirement_index": 2},
-                {"id": "status_404", "type": "regex", "file": "server.js", "pattern": r"404", "label": "Returns 404 for missing resources", "concept": "status codes", "requirement_index": 1},
-                {"id": "status_201", "type": "regex", "file": "server.js", "pattern": r"201", "label": "Returns 201 on creation", "concept": "status codes", "requirement_index": 2},
-                {"id": "status_400", "type": "regex", "file": "server.js", "pattern": r"400", "label": "Returns 400 for invalid input", "concept": "validation", "requirement_index": 3},
+                # Registering a path is not implementing an endpoint.
+                {"id": "handlers_implemented", "type": "js_handlers_implemented", "file": "server.js", "label": "Every route actually answers", "concept": "routes", "hint": "`app.get(\"/api/{entity_plural}\", (req, res) => {})` registers a route that returns nothing at all.", "requirement_index": 0},
+                # 404 and 400 have to be branches. A handler that always answers
+                # 404 is not "returns 404 when missing", it is a broken route —
+                # and the bare regex `404` was satisfied by the number appearing
+                # in a comment.
+                {"id": "status_404", "type": "js_route_status", "file": "server.js", "status": 404, "method": "get", "conditional": True, "label": "Returns 404 for missing resources", "concept": "status codes", "hint": "Look the {entity} up, then `if (!found) return res.status(404).json(...)`.", "requirement_index": 1},
+                {"id": "status_201", "type": "js_route_status", "file": "server.js", "status": 201, "method": "post", "label": "Returns 201 on creation", "concept": "status codes", "requirement_index": 2},
+                {"id": "status_400", "type": "js_route_status", "file": "server.js", "status": 400, "method": "post", "conditional": True, "label": "Returns 400 for invalid input", "concept": "validation", "hint": "Validate the body first, and answer 400 only when the validation actually failed.", "requirement_index": 3},
             ],
         }
     ],
@@ -2754,6 +2779,30 @@ module.exports = app;
 """,
     "schema.sql": """-- {domain} database schema.
 -- Implement the ticket requirements below.
+""",
+    # The client gets a file of its own on purpose. It is the one module in this
+    # project that must not touch the DOM, and script.js — which the DOM and
+    # async tickets spend four tickets filling with `innerHTML` and
+    # `document.getElementById` — can never satisfy that. Sharing the file made
+    # the ticket unpassable unless the learner deleted the four tickets they had
+    # already been paid for, which blanked the composed preview.
+    "api.js": """// {domain} — API client.
+//
+// The only module that knows the base URL, the headers and what a failure looks
+// like. Nothing in here renders: it returns data and throws on failure, so any
+// screen — the vanilla listing today, the React port later — can reuse it.
+//
+// Shape to build:
+//
+//   const API_BASE_URL = "/api";            one place the URL lives
+//
+//   async function request(path, options)   the single private helper
+//   async function listAll()                the collection endpoint, no arguments
+//   async function getOne(id)               the single-item endpoint, takes an id
+//
+// Name them for the {entity_plural} they fetch; the shape is what matters.
+
+// Implement the ticket requirements below.
 """,
     **DATA_STARTER_FILES,
 }

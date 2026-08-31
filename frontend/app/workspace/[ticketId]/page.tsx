@@ -3,7 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { GrowBar } from "@/components/motion";

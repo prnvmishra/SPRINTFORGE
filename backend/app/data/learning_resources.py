@@ -154,4 +154,26 @@ EXTERNAL_RESOURCES: dict[str, list[dict[str, Any]]] = {
         {"kind": "documentation", "title": "Microsoft: XLOOKUP function", "minutes": 12, "url": "https://support.microsoft.com/en-us/office/xlookup-function-b7fd680e-6d10-43e6-84f9-88eae8bf5929"},
         {"kind": "documentation", "title": "Google Sheets: Function list", "minutes": 10, "url": "https://support.google.com/docs/table/25273"},
     ],
+    # The five skills below were shipping with no external reference at all, so
+    # "Read up first" rendered empty for them.
+    "sql_basics": [
+        {"kind": "concept_guide", "title": "PostgreSQL: SQL language tutorial", "minutes": 25, "url": "https://www.postgresql.org/docs/current/tutorial-sql.html"},
+        {"kind": "documentation", "title": "PostgreSQL: SELECT", "minutes": 15, "url": "https://www.postgresql.org/docs/current/sql-select.html"},
+    ],
+    "sql_joins": [
+        {"kind": "concept_guide", "title": "PostgreSQL: Joins between tables", "minutes": 20, "url": "https://www.postgresql.org/docs/current/tutorial-join.html"},
+        {"kind": "documentation", "title": "PostgreSQL: Table expressions and join types", "minutes": 20, "url": "https://www.postgresql.org/docs/current/queries-table-expressions.html"},
+    ],
+    "sql_aggregation": [
+        {"kind": "concept_guide", "title": "PostgreSQL: Aggregate functions", "minutes": 18, "url": "https://www.postgresql.org/docs/current/tutorial-agg.html"},
+        {"kind": "documentation", "title": "PostgreSQL: GROUP BY and HAVING", "minutes": 15, "url": "https://www.postgresql.org/docs/current/queries-table-expressions.html"},
+    ],
+    "sql_analytics": [
+        {"kind": "concept_guide", "title": "PostgreSQL: Window functions", "minutes": 25, "url": "https://www.postgresql.org/docs/current/tutorial-window.html"},
+        {"kind": "documentation", "title": "PostgreSQL: WITH queries (CTEs)", "minutes": 20, "url": "https://www.postgresql.org/docs/current/queries-with.html"},
+    ],
+    "typescript_basics": [
+        {"kind": "concept_guide", "title": "TypeScript: The handbook", "minutes": 30, "url": "https://www.typescriptlang.org/docs/handbook/intro.html"},
+        {"kind": "documentation", "title": "TypeScript: Everyday types", "minutes": 20, "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html"},
+    ],
 }

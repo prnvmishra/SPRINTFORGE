@@ -11,6 +11,7 @@ import { cn, confidenceTone } from "@/lib/utils";
 const STATE_COPY: Record<LearningPathStep["state"], string> = {
   verified: "Verified",
   in_progress: "In progress",
+  needs_work: "Needs work",
   not_started: "Not started",
   locked: "Locked",
 };
@@ -27,7 +28,7 @@ type MilestoneGroup = {
  * Group order follows first appearance in the path, so the vertical reading
  * order stays identical to the prerequisite-derived sequence.
  */
-export function groupByMilestone(
+function groupByMilestone(
   path: LearningPathStep[],
   milestones: LearningMilestone[],
 ): MilestoneGroup[] {
@@ -125,7 +126,7 @@ function MilestoneHeader({ milestone }: { milestone: LearningMilestone | null })
 
       <GrowBar
         value={percent}
-        tone={milestone.status === "complete" ? "success" : "muted"}
+        tone={milestone.status === "completed" ? "success" : "muted"}
         className="mt-3"
       />
     </div>

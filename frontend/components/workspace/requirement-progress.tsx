@@ -138,7 +138,7 @@ function inferPairs(
  *
  * A requirement nothing grades is reported as "ungraded", never as unmet.
  */
-export function matchRequirements(
+function matchRequirements(
   requirements: string[],
   checks: CheckResult[],
 ): RequirementRow[] {

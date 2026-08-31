@@ -47,3 +47,24 @@ def get_current_twin(db: DbSession, user: CurrentUser) -> LearningDigitalTwin:
 
 
 CurrentTwin = Annotated[LearningDigitalTwin, Depends(get_current_twin)]
+
+
+def get_optional_twin(
+    db: Annotated[Session, Depends(get_db)],
+    authorization: Annotated[Optional[str], Header()] = None,
+    sf_token: Annotated[Optional[str], Cookie()] = None,
+) -> Optional[LearningDigitalTwin]:
+    """The twin when there is a valid session, otherwise None.
+
+    For endpoints whose content is public but reads better when personalised.
+    Deliberately does not create a twin: a logged-out visitor must not cause a
+    row to be written, and `get_or_create_twin` would do exactly that.
+    """
+    try:
+        user = get_current_user(db, authorization, sf_token)
+    except HTTPException:
+        return None
+    return db.query(LearningDigitalTwin).filter(LearningDigitalTwin.user_id == user.id).first()
+
+
+OptionalTwin = Annotated[Optional[LearningDigitalTwin], Depends(get_optional_twin)]

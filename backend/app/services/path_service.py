@@ -15,6 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.data.assessment_bank import ITEMS_BY_SKILL
+from app.data.curriculum import hidden_case_count
 from app.data.paths import PATH_INDEX, PATHS, find_course
 from app.data.practice_modules import PRACTICE_MODULES
 from app.models import LearningDigitalTwin, Project, VerifiedSkill
@@ -64,11 +65,6 @@ def ordered_skills(skills: list[str]) -> list[str]:
     return _ordered_skills(skills)
 
 
-def modules_for_skills(skills: set[str]) -> list[dict[str, Any]]:
-    """Public alias: the same skill -> practice module matching courses use."""
-    return _modules_for_skills(skills)
-
-
 def _modules_for_skills(skills: set[str]) -> list[dict[str, Any]]:
     graph = get_knowledge_graph()
     modules = [m for m in PRACTICE_MODULES if m["skill_id"] in skills]
@@ -83,9 +79,7 @@ def _modules_for_skills(skills: set[str]) -> list[dict[str, Any]]:
             "skill_name": graph.name_of(m["skill_id"]),
             "difficulty": m["difficulty"],
             "estimated_minutes": m.get("estimated_minutes", 20),
-            "hidden_test_count": sum(
-                1 for t in m.get("test_cases", []) if t.get("hidden")
-            ),
+            "hidden_test_count": hidden_case_count(m),
             "xp_reward": reward_service.xp_for_difficulty(m["difficulty"]),
         }
         for m in modules

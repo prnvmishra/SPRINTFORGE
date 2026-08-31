@@ -32,7 +32,7 @@ import tempfile
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
-from app.data.curriculum import CURRICULUM_MODULES  # noqa: E402
+from app.data.curriculum import CURRICULUM_MODULES, graded_cases  # noqa: E402
 from app.data.curriculum_basics_c import PROBLEMS as BASICS_C  # noqa: E402
 from app.data.curriculum_basics_cpp import PROBLEMS as BASICS_CPP  # noqa: E402
 from app.data.curriculum_basics_java import PROBLEMS as BASICS_JAVA  # noqa: E402
@@ -57,7 +57,7 @@ def _cases(module: dict) -> list[TestCase]:
             hidden=case["hidden"],
             match=case.get("match", "trimmed"),
         )
-        for case in module["test_cases"]
+        for case in graded_cases(module)
     ]
 
 

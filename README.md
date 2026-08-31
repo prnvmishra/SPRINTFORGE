@@ -29,12 +29,13 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env
 (cd app/tools/js_ast && npm install)   # acorn, used by the JavaScript validator
-PYTHONPATH=. .venv/bin/python scripts/build_test_cases.py   # once; see below
+PYTHONPATH=. .venv/bin/python -m scripts.build_test_cases   # once, ~7 min; see below
+PYTHONPATH=. .venv/bin/python -m scripts.split_case_bank
 .venv/bin/uvicorn app.main:app --reload --port 8000
 ```
 
 `build_test_cases.py` produces `app/data/generated_cases.json`, the judge's expected
-outputs for every curriculum problem. It is untracked because it is ~188MB — past the
+outputs for every curriculum problem. It is untracked because it is ~197MB — past the
 100MB file limit a remote will accept — and it is derived data, so the checked-in
 problem definitions remain the single source of truth.
 
@@ -44,9 +45,30 @@ against full-scale inputs. Rebuild only when you add or edit a problem, and pref
 incremental form, which is seconds rather than minutes:
 
 ```bash
-PYTHONPATH=. .venv/bin/python scripts/build_test_cases.py --only <slug-prefix>
-PYTHONPATH=. .venv/bin/python scripts/build_test_cases.py --check   # CI: is it stale?
+PYTHONPATH=. .venv/bin/python -m scripts.build_test_cases --only <slug-prefix>
+PYTHONPATH=. .venv/bin/python -m scripts.build_test_cases --check   # CI: is it stale?
 ```
+
+`split_case_bank.py` then derives what the API actually reads. The bank is an
+*authoring* artifact and is never loaded at runtime: parsing all 197MB at import cost
+14 seconds and 580MB of peak memory, for the sake of a handful of cases per module.
+The split writes the 280 visible cases into one 60KB manifest and each problem's
+hidden cases into a gzipped per-slug file, fetched only when a submission is graded.
+Boot is now ~1.6s and ~96MB.
+
+`visible.json` and `modules.json` are committed, so a fresh checkout boots without the
+seven-minute build. The gzipped `cases/hidden/` directory (76MB) is not — without it the
+app runs normally and fails clearly on the first Submit.
+
+If you edit a problem's statement, `io` spec or visible cases, rebuild the manifest too:
+
+```bash
+PYTHONPATH=. .venv/bin/python -m scripts.build_curriculum_manifest
+PYTHONPATH=. .venv/bin/python -m scripts.build_curriculum_manifest --check   # CI
+```
+
+The test suite asserts both derived artifacts are in step with the bank, so drift fails
+in CI rather than in front of a learner.
 
 `app/tools/js_ast` is vendored (its `node_modules` is committed), so a clean checkout
 works without the `npm install` above; run it only if the directory is missing or you
@@ -88,6 +110,18 @@ cd backend
 .venv/bin/python -m pytest tests
 .venv/bin/python scripts/verify_strict_validation.py
 ```
+
+The rendered HTML/CSS checks in that suite drive a headless Chromium, so they need the
+browser installed once:
+
+```bash
+cd backend
+.venv/bin/playwright install chromium
+```
+
+They **fail closed** without it, reporting a tooling error rather than passing. That is the
+correct behaviour, but it does mean a sandbox or CI runner with no browser reports failures
+that are about the environment and not the code.
 
 A second suite covers the workspace editor in a real browser — per-file tab isolation,
 persistence of typed edits across tab switches, read-only enforcement on provided files, and
@@ -217,6 +251,9 @@ submits raw code and renders whatever the backend concluded.
 > **Security note:** `CODE_EXECUTION_PROVIDER=local` runs code in a subprocess with resource
 > limits. That is adequate for local development only — it is *not* a sandbox. Use `piston`
 > or `judge0` for anything multi-tenant or internet-facing.
+>
+> This is enforced rather than advised: with `ENVIRONMENT=production` the app **refuses to
+> start** while the executor is `local`. See [Deploying](#deploying).
 
 ---
 
@@ -251,6 +288,34 @@ serverless Postgres (`pool_recycle=300`) to avoid handing out connections the pl
 already closed.
 
 Secrets belong in `backend/.env`, which is gitignored. Only `.env.example` is tracked.
+
+---
+
+## Deploying
+
+Set `ENVIRONMENT=production` and the app validates its own configuration at startup, refusing
+to boot while anything below is unsafe. Each of these is harmless on a laptop and severe on a
+public host, which is exactly why they are checked by the machine rather than by memory:
+
+| Must be set | Why it blocks startup |
+|---|---|
+| `CODE_EXECUTION_PROVIDER=piston` or `judge0` | `local` runs learner-submitted code as the API process. On a public host that is arbitrary remote code execution. |
+| `AUTH_SECRET` ≠ the dev default | The default is in this repository, so anyone who has read it could mint a token for any account. Use 64+ random characters. |
+| `DATABASE_URL` not SQLite | A container restart would take every learner's XP, levels and ticket history with it. |
+| `JUDGE0_API_KEY` (only if using `judge0`) | Otherwise every submission fails as a tooling error. |
+
+Every problem is reported at once, so a misconfigured deploy takes one round-trip to diagnose
+rather than one per variable. `CORS_ORIGIN_REGEX`'s any-localhost allowance is ignored in
+production automatically — set `CORS_ORIGINS` to the real frontend origin.
+
+Verify a deploy is genuinely sandboxed by checking the startup log, which states it outright:
+
+```
+SprintForge.AI started · AI provider=gemini · execution provider=piston (sandboxed=True)
+```
+
+Locally, where `local` is the point, the same line reads `sandboxed=False` and is followed by
+a warning. The guards are covered by `backend/tests/test_production_safety.py`.
 
 ---
 

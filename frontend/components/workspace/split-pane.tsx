@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * there is room for one — below the breakpoint the panes stack and size to
  * their content instead of fighting over a short viewport.
  */
-export function useMediaQuery(query: string): boolean {
+function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {

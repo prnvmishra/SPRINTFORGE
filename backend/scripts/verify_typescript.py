@@ -42,6 +42,7 @@ from app.data.curriculum_basics_typescript import (  # noqa: E402
     TYPESCRIPT_BASICS_MODULES,
     WRONG_SOLUTIONS,
 )
+from app.data.curriculum import graded_cases  # noqa: E402
 from app.data.practice_modules import PRACTICE_MODULE_INDEX  # noqa: E402
 from app.schemas.execution import TestCase  # noqa: E402
 from app.services import code_execution_service as ces  # noqa: E402
@@ -62,7 +63,7 @@ def _cases(module: dict) -> list[TestCase]:
             hidden=case["hidden"],
             match=case.get("match", "trimmed"),
         )
-        for case in module["test_cases"]
+        for case in graded_cases(module)
     ]
 
 

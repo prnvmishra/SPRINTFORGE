@@ -419,7 +419,7 @@ function PlacementOutcome({
           />
           {start.first_skill_name ? (
             <p className="text-[12px] leading-relaxed text-muted">
-              First thing you'll prove:{" "}
+              First thing you&apos;ll prove:{" "}
               <span className="text-ink">{start.first_skill_name}</span>. You implement it
               immediately — the course only advances when a judge says your code is right.
             </p>

@@ -2060,6 +2060,32 @@ for region in sorted(regions):
     ],
 )
 
+def _correlation_scale_stdin() -> str:
+    """A full-size input for the correlation question.
+
+    Every other case here is a handful of numbers, so nothing exercised the
+    stated `n <= 20000` at all. Measured, at n = 20000 against a 10s limit:
+
+    * the linear reference finishes in ~200ms;
+    * recomputing the means with explicit Python loops inside the multiply loop
+      times out, so that shape of quadratic is rejected;
+    * recomputing them with `sum()` inside the loop still passes in ~3s. It is
+      the same 4 * 10^8 additions, but `sum` runs them in C. Do not read this
+      case as a complexity gate — it is not one, and this question states no
+      complexity requirement to enforce. Rejecting that version would need a
+      larger n than the declared constraint allows.
+
+    `y = 2x` makes r exactly 1, so the expected value sits nowhere near a
+    rounding boundary and no correct implementation can disagree at three
+    decimal places because it summed in a different order. x stays within
+    [-5000, 5000] so that y stays inside the declared [-10000, 10000].
+    """
+    n = 20000
+    xs = [(i % 10001) - 5000 for i in range(n)]
+    ys = [2 * x for x in xs]
+    return f"{n}\n" + " ".join(map(str, xs)) + "\n" + " ".join(map(str, ys)) + "\n"
+
+
 _problem(
     id="an-eda-correlation",
     title="Correlation Between Two Columns",
@@ -2102,6 +2128,7 @@ _problem(
         ("hidden: weak positive relationship", "6\n1 2 3 4 5 6\n2 1 4 3 6 5\n", True),
         ("hidden: uncentred formula gives a different answer", "5\n10 11 12 13 14\n1 3 2 5 4\n", True),
         ("hidden: negative values", "4\n-2 -1 1 2\n4 1 1 4\n", True),
+        ("hidden: scale — compute the means once", _correlation_scale_stdin(), True),
     ],
     reference="""import sys
 import math

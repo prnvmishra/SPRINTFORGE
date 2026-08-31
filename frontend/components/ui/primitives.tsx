@@ -33,9 +33,6 @@ export function Panel({
   );
 }
 
-/** Back-compat alias: existing pages import `Card`. */
-export const Card = Panel;
-
 /**
  * Section header with a mono eyebrow. The eyebrow carries the taxonomy so the
  * title itself can stay short and human.
@@ -180,11 +177,6 @@ export function Loader({
       </span>
     </div>
   );
-}
-
-/** Back-compat alias for the old spinner API. */
-export function Spinner({ label }: { label?: string }) {
-  return <Loader label={label ?? "Loading"} />;
 }
 
 /** Full-region loading state with skeleton lines, for first paint of a panel. */

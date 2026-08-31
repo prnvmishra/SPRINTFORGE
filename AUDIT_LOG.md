@@ -253,3 +253,259 @@ Same cure as BUG 2: assert the computed value on the element itself via `render_
 both the false negatives and the false positives, because both come from grading text instead of
 grading the rendered result.
 
+
+### ARS-12 — api_integration — "Create the API client for recipes" — PASS (12/12, +130 XP)
+
+Solution: `/tmp/sol_ars12_final.js`. Passed only after **deleting ARS-6…ARS-11's graded work**.
+
+**BUG 10 (CRITICAL) — ARS-12 is unpassable without destroying four earlier tickets, and it blanks the preview.**
+- Repro: with the cumulative `script.js` (ARS-6…11 all `done`, all green) plus a correct API client
+  appended, ARS-12 scores **11/12**; the only failure is `no_dom`:
+  `must not contain (?:document\s*\.|innerHTML|textContent|innerText|querySelector)`.
+  Delete ARS-8…11's rendering code and the same client scores **12/12**.
+- Root cause: `TICKET_TEMPLATES["api_integration"][0]` declared `"files": ["script.js"]` and scoped all
+  14 checks to `script.js` — the same file `js_dom`, `js_async` and `js_async_error_handling` spend four
+  tickets filling with `innerHTML` / `document.getElementById`, and are graded green for doing so.
+  A `not_regex` over that whole file is therefore unsatisfiable.
+- Consequence (evidence for accusation 5): after submitting, the composed preview renders
+  **0 cards** — `audit_screens/ars12_after_strip.png`. The page is a header, a hero and an empty
+  section. Preview still lists ARS-1…ARS-12 as contributors, so it *looks* cumulative while the
+  product's whole visible output is gone.
+- **FIXED** (root cause): the client now gets its own file.
+  - `ticket_templates.py`: new `STARTER_FILES["api.js"]` scaffold; `api_integration` template
+    `files` → `["api.js"]`, `solution_files` → `api.js`, all 13 checks re-scoped to `api.js`.
+  - `script.js` is untouched by this ticket, so ARS-8…11's rendering survives and the preview stays
+    cumulative. `api.js` is not referenced by `index.html`, so the preview is unaffected by it.
+  - `tests/test_requirement_mapping.py`: `run()` now takes the filename from the template.
+- **NEEDS A RESTART TO VERIFY END-TO-END.** Specs are frozen per ticket at creation, so this fix
+  cannot apply to my existing project. Verified at the template/check level by the test suite only.
+
+**BUG 11 (MEDIUM) — the collection-endpoint check graded the function's *name*, and false-passed.**
+- Repro: `async function fetchRecipes()` + `async function fetchRecipe(id)` — a correct, idiomatic
+  client — FAILED `list_endpoint`, whose regex accepted only
+  `(?:list|getAll|fetchAll|load)\w*`. Conversely, in the cumulative file the check PASSED for the
+  wrong reason: it matched `loadMovies()`, left over from ARS-10, which never calls the client.
+- Root cause: name-matching regex (same class as BUG 4).
+- **FIXED**: replaced `list_endpoint` + `detail_endpoint` with one new AST check type
+  `js_endpoint_pair` (`validation_service.py`, `_network_reaching_functions`). It resolves the call
+  graph to find functions that *transitively reach `fetch`*, drops the private helpers those
+  endpoints delegate to, and then uses **arity** — a collection call takes no id, a single-item call
+  takes one. Name-agnostic and strictly stronger.
+- Verified pass/fail on 8 cases: `fetchRecipes/fetchRecipe` ✅, `listAll/getOne` ✅, arrow-function
+  client ✅, no-helper client ✅; one path-taking function ❌, no-network functions ❌, collection-only ❌,
+  detail-only ❌. Four regression tests added to `tests/test_validation_strict.py`.
+
+### ARS-13 — react_fundamentals — "Convert the recipe list to React components" — PASS (17/17, +30 XP)
+
+Solution: `/tmp/sol_ars13.jsx`. **17/17 on the first attempt, no fighting the grader.** React static
+checks are well built: they check the component boundary, prop-passing, the keyed `.map`, the
+landmarks the stylesheet depends on, and JSX-vs-HTML details.
+
+Garbage submissions — **all 7 correctly FAILED**:
+| payload | result |
+|---|---|
+| `key={index}` instead of `key={recipe.id}` | 15/17 — both key checks fail |
+| `class` instead of `className` | 15/17 |
+| hardcoded single card, no `.map`, Card never rendered | 14/17 |
+| empty file | 4/17 (the 4 are vacuous `not_regex` checks; verdict fails) |
+| syntax error (`function App( {`) | precondition `App.jsx does not parse` fails |
+| one component reading a global, no Card | 14/17 |
+| unstyled `<div>` soup (landmarks dropped) | 11/17 |
+
+**BUG 12 (HIGH) — the React tickets contribute NOTHING to the preview. The preview is not cumulative
+past ARS-12.**
+- Repro: before ARS-13 the composed preview was 8873 bytes. After ARS-13 passed 17/17 it is
+  **8873 bytes — byte-identical**. `App.jsx` appears in the preview's `files` map and `ARS-13`
+  appears in `contributors`, but `grep -c "Charred Leek Risotto\|React\|babel\|createRoot"` on the
+  composed HTML returns **0**. Not one byte of the React work is in the document.
+- Root cause: `project_preview_service.py` has `ENTRY_FILE = "index.html"` and
+  `BROWSER_SCRIPT = "script.js"`. `_append_unreferenced()` (line 434) appends only `*.css` and the
+  single filename `script.js`; every other file, `App.jsx` included, is skipped by design. There is
+  **no JSX transpiler and no React runtime anywhere in the backend** — `rg -i "babel|react-dom|createRoot"`
+  matches only `docs/typescript.md` and `code_execution_service.py` (which is about `tsc` for the
+  judge), and `backend/node_modules` contains only `typescript`, `@types`, `undici-types`.
+- Consequence: ARS-13, ARS-14 and ARS-15 — the entire "React Migration" sprint, 3 of 18 tickets —
+  are graded but invisible. The preview keeps showing the *vanilla* `script.js` page, so the
+  "migration" never migrates anything the learner can see. Combined with BUG 10 (which empties
+  `script.js`), the page a learner is left with after ARS-12–15 is an empty section.
+- **NOT FIXED — needs the owner's decision.** This is a new capability, not a bug fix: making it work
+  means vendoring `react`, `react-dom` (UMD) and a JSX transpiler (`@babel/standalone` or `esbuild`)
+  into `backend/package.json`, teaching `_assemble` to emit a React host document that mounts the
+  default export into `#app` when `App.jsx` is present, and deciding precedence between `script.js`
+  and `App.jsx` once both exist. ~3MB of vendored assets, and the preview must keep working offline.
+  I am not making that architectural call unilaterally.
+
+### ARS-14 — react_state — "Manage selection state with hooks" — PASS (13/13)
+
+Solution: `/tmp/sol_ars14b.jsx` (multi-select, immutable updater form, live-region summary with a real
+empty state). First attempt scored 11/13; both failures were **false negatives on correct code**.
+
+Garbage submissions — **all 5 correctly FAILED**: `push` mutation (11/13), non-updater stale read
+(11/13), card reaching into `classList`/`querySelector` (11/13), no `aria-pressed` (12/13), state
+removed from the parent (11/13). The immutability and lifting-state checks are genuinely sound.
+
+**BUG 13 (MEDIUM) — the useState check required the hook to be spelled bare, which the starter's own
+import makes impossible, and required the state variable to be *named* "select".**
+- Repro: `const [selectedIds, setSelectedIds] = React.useState([]);` FAILS `selection_state`
+  (`const\s*\[\s*\w*[Ss]elect\w*\s*,\s*set\w+\s*\]\s*=\s*useState`) while the AST-based
+  `usestate` check on the same line PASSES. The starter file supplies only
+  `import React from "react"`, so `React.useState` is the spelling it leads you to.
+  Renaming the state to `tonight` also failed, for no behavioural reason.
+- **FIXED**: new AST check type `js_state_pair` (`validation_service.py`) matches the destructuring
+  itself — an `ArrayPattern` of two bindings initialised by a call to `useState`, bare or as a member
+  call — and requires only that the second binding be named `set*`. The *meaning* of the state is
+  already carried by `selection_prop`, `aria_pressed` and `conditional_class`, so nothing is weakened.
+  Verified on 8 cases; 4 regression tests added. Template `selection_state` switched to it.
+
+**BUG 14 (MEDIUM, NOT FIXED) — the empty-state check demands one particular JSX shape.**
+- Repro: `summary_conditional` pattern `\{\s*\w+\s*\?[\s\S]{0,600}?:\s*(?:\(|<)` requires the
+  ternary's condition to be a **bare single identifier** and its alternate to begin with `(` or `<`.
+  A correct summary that renders one `<p>` with either of two strings —
+  `{selected.length === 0 ? "Nothing chosen yet…" : \`${selected.length} chosen\`}` — FAILS, even
+  though it renders a perfectly good empty state. I had to restructure working code into
+  `{hasSelection ? (<>…</>) : (<p>…</p>)}` purely to satisfy the regex.
+- Root cause: same family as BUG 4/11/13 — a regex grading incidental source shape.
+- Not fixed: doing it properly needs JSX-subtree analysis (find the conditional inside the element
+  carrying `aria-live`), and a naive widening would let the Card's own
+  `{isSelected ? "Remove" : "Add"}` label satisfy the summary's check. Owner's call.
+
+### ARS-15 — react_data_fetching — "Fetch recipes inside React with loading and error states" — PASS (20/20)
+
+Solution: `/tmp/sol_ars15.jsx`. **20/20 first attempt.** Genuinely good ticket: four states,
+`AbortController` cleanup, `AbortError` suppression, `role="status"`/`role="alert"`.
+
+Garbage submissions — 6 of 7 correctly FAILED (no cleanup 17/20, no dependency array 19/20,
+AbortError rendered as failure 19/20, `response.ok` skipped 19/20, empty state removed 19/20,
+roles stripped 18/20). **One passed and should not have:**
+
+**BUG 15 (TOP SEVERITY — a garbage submission PASSED) — the error UI is never checked to be reachable.**
+- Exact payload: take the passing solution and change one line inside `catch`:
+  `setError(requestError.message);` → `console.error(requestError);`
+  Result: **20/20, verdict PASS.** This is precisely the anti-pattern the ticket's own brief opens by
+  warning against — "announced with `role="alert"`, not logged to a console nobody has open".
+- Why it passed: the three relevant checks each pass in isolation. `error_state` sees
+  `const [error, setError] = useState(null)`. `error_ui` sees `role="alert"` in the JSX.
+  `catch_handles` (`js_catch_handles`) accepts `console.error(error)` as "acting on the error".
+  **Nothing checked that the catch writes to the error state**, so the `role="alert"` branch is
+  unreachable dead code and the learner ships a component that silently shows nothing on failure.
+- **FIXED**: new AST check type `js_catch_sets_state` (`validation_service.py`, with helpers
+  `_state_setters` and `_is_flag_literal`), added to the `react_data_fetching` template as
+  `catch_sets_error_state`. It requires a catch clause to call a `useState` setter with an argument
+  that is not a boolean/null flag, so `setError(error.message)` and `setError("friendly text")` pass
+  while `console.error(...)`, `setIsLoading(false)` alone, and an empty catch fail — with a message
+  that names the problem ("the error never reaches state, so the error UI can never render").
+- Verified on 6 cases; 4 regression tests added to `tests/test_validation_strict.py`.
+- **NEEDS A RESTART + a fresh project to verify end-to-end** (frozen specs).
+
+### ARS-16 — node_basics — "Stand up the Node.js server" — PASS (5/5, +30 XP)
+
+Solution: `/tmp/sol_ars16c.js`. Garbage submissions correctly failed: untouched starter 1/5,
+empty file 1/5, syntax error (precondition fails), no `listen`/no env port 2/5.
+
+**BUG 16 (MEDIUM) — the JSON check requires the response parameter to be named `res` AND forbids
+`res.status(200).json(...)`.**
+- Repro, both correct and both FAILED `json` (`(res\.json|application/json)`):
+  1. `app.get("/health", (request, response) => response.status(200).json({...}))` — the parameter
+     naming every other ticket in this project uses.
+  2. `app.get("/health", (req, res) => res.status(200).json({...}))` — correct `res` naming, but
+     `res.status(200).json` does not contain the literal substring `res.json`. **Setting an explicit
+     status code, which is standard Express, breaks the check.**
+  Only the exact form `res.json({...})` passes, so the grader teaches you to omit the status code.
+- **FIXED**: pattern → `(?<!express)\.json\s*\(|application/json`. Matches `.json(` on any response
+  object with or without a chained `.status()`, and on a `Content-Type: application/json` header.
+  The negative lookbehind excludes `express.json()` — the body-parser already present in the
+  starter — so the untouched starter still fails. Verified on 6 cases.
+
+**OBSERVATION (MEDIUM) — the backend tickets are drastically thinner than the frontend ones.**
+ARS-16 has **3 requirements and 5 purely textual checks**, versus 20 checks (several AST-based, plus
+behaviour tests) for ARS-15. It has **no `solution_files`**, so `test_every_web_module_solution_passes_its_own_checks`
+never exercises it, and there are **no behaviour tests** — nothing ever starts the server or requests
+`/health`. `app.get("/health", () => {})` with an empty body and a stray `res.json` in a comment
+elsewhere would score 5/5. The backend half of the curriculum is graded by grep.
+
+### ARS-17 — rest_api — "Implement the recipe REST endpoints" — PASS (7/7, +30 XP)
+
+Solution: `/tmp/sol_ars17.js` (in-memory store, 404 branch, field-level validation, 201 + Location).
+
+**BUG 17 (TOP SEVERITY — a garbage submission PASSED END TO END, verdict `passed=True`, status
+`done`, +30 XP) — the REST ticket is graded entirely by grep.**
+- Exact payload submitted (`POST /api/tickets/{id}/submit`), scored **7/7, `passed: true`,
+  `status: "done"`, 30 XP awarded**:
+```js
+const express = require("express");
+const app = express();
+app.use(express.json());
+app.get("/api/recipes", (req, res) => {});
+app.get("/api/recipes/:id", (req, res) => {});
+app.post("/api/recipes", (req, res) => {});
+const codes = [404, 201, 400];
+module.exports = app;
+```
+  Three **completely empty handlers**. Nothing is looked up, nothing is validated, nothing is
+  created; every request hangs until Express times out. The status codes are in an unused array.
+  (I restored the real solution immediately afterwards — the project's stored `server.js` is the
+  genuine implementation.)
+- A second fake also scored 7/7: unconditional `res.status(404)` on the detail route (so it *always*
+  404s), unconditional 201 on create with no validation, and the 400 on an unrelated `PUT /x`.
+- Root cause: `TICKET_TEMPLATES["rest_api"][0]["checks"]` — the three status checks were the bare
+  regexes `r"404"`, `r"201"`, `r"400"`, matching the digits **anywhere in the file, comments
+  included**, and the route checks matched only the registered path string. Nothing looked inside a
+  handler. There are no behaviour tests and no `solution_files` for this template.
+- **FIXED** with two new AST check types in `validation_service.py`:
+  - `js_handlers_implemented` — every `app.<method>(path, handler)` must have a non-trivial handler
+    body (reuses `js_ast.statement_is_trivial`). Kills the empty-handler fake.
+  - `js_route_status` — takes `status`, an optional `method`, and `conditional`. The code must be an
+    argument to a `.status()`/`sendStatus()` call **inside a route handler of that method**, and when
+    `conditional` is set it must be sent from a branch (`if`/ternary/`switch`/`&&`). 404 and 400 are
+    marked conditional; the happy-path 201 is not.
+  - Helpers added: `_route_handlers`, `_status_calls`, `_conditional_status_calls`.
+- Result: real solution **8/8**; fake 1 → 4/8; fake 2 → 6/8 (`404 is sent unconditionally`);
+  fake 3 (codes only in a comment) → 5/8. Four regression tests added.
+- **Full backend suite after all of today's fixes: 3339 passed, 0 failed** (was 3323; +16 new tests).
+- **NEEDS A RESTART + a fresh project to verify end-to-end** (frozen specs).
+
+### ARS-18 — database_modeling — "Model the database schema" — VERIFIED GREEN, submit NOT RECORDED
+
+Solution: `/tmp/sol_ars18.sql` (three tables, PK/FK with deliberate `ON DELETE` choices, CHECK and
+UNIQUE constraints, indexes on both foreign keys). It scored **5/5 on `run`**. The `submit` call was
+in flight when the backend process died, so the ticket is still `in_progress` in the database.
+Project is at **94.4% — ARS-1…ARS-17 all `done`**.
+
+**BUG 18 (TOP SEVERITY — a garbage submission PASSED) — SQL `--` comments were never stripped, so a
+schema of pure comments satisfied every check.**
+- Exact payload, scored **5/5** on the live API:
+```sql
+-- PRIMARY KEY FOREIGN KEY NOT NULL CREATE INDEX
+-- CREATE TABLE recipes CREATE TABLE bookings
+SELECT 1;
+```
+  No table is created. Every keyword the five checks grep for is inside a comment.
+- Root cause: `validation_service._strip_comments()` stripped HTML comments, `/* */` and `//`
+  — the docstring says commented-out code "must not satisfy a positive `regex` check" — but knew
+  nothing about SQL's `--`. It also took no filename, so it could not treat `.sql` differently.
+- **FIXED**: `_strip_comments(source, filename)` now also strips `-- …` for `.sql` files, via a new
+  `_strip_sql_line_comments()` that walks each line and stops at quotes, so a `--` inside a string
+  literal survives (stripping `--` unconditionally would corrupt JS `i--` and CSS `--custom-props`,
+  hence the extension gate). Both call sites updated to pass `target`.
+- Verified: the fake goes **5/5 → 0/5**; the real schema stays 5/5; a schema whose DEFAULT is the
+  string `'-- not a comment'` stays 5/5. Two regression tests added.
+- **This fix is in the check runner, not in a ticket spec, so it applies to every existing project as
+  soon as the backend restarts** — unlike the template fixes, which are frozen per ticket.
+
+Other ARS-18 garbage results (correct): one table with no FK/index 2/5, empty file 0/5.
+
+---
+
+## BACKEND DOWN — audit halted here
+
+The backend process serving `127.0.0.1:8000` died mid-`submit` on ARS-18 (nothing listening; the
+previous supervisor terminal shows `status: failed`). I asked for approval to restart it and the
+approval dialog itself failed, so I could not bring it back up. Everything below this line is
+**NOT DONE**:
+
+- **ARS-18 submit** — solution verified 5/5 by `run`, but the ticket is still `in_progress`.
+- **Data Analyst path** — no project created, no tickets worked, no SQL/analytics practice modules. Untouched.
+- **Practice modules / the judge** — nothing run. **The compiler and judge remain completely
+  unverified**: no C, C++, Java, Python or TypeScript submission was executed, so I have no evidence
+  either way on whether correct solutions pass, wrong solutions fail, TypeScript type errors fail, or
+  syntax errors fail. The owner's doubt about the compiler is neither confirmed nor refuted.

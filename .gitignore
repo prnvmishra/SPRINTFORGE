@@ -46,6 +46,15 @@ Thumbs.db
 backend/uploads/
 
 # ------------------------------------------------------------- generated
-# 188MB of judge test cases, rebuilt by scripts/build_test_cases.py. Far past
+# 197MB of judge test cases, rebuilt by scripts/build_test_cases.py. Far past
 # the 100MB file limit a remote will accept, and derivable from the curriculum.
 backend/app/data/generated_cases.json
+
+# The runtime case store and module manifest, derived from the bank above by
+# scripts/split_case_bank.py and scripts/build_curriculum_manifest.py. The API
+# reads these instead of the bank, which is what keeps its boot at ~1.5s and
+# ~96MB instead of 14s and 580MB.
+#
+# hidden/ is 76MB gzipped and stays out of git for the same reason as the bank;
+# a deployment ships it as a tarball. See the deployment section of README.md.
+backend/app/data/cases/hidden/

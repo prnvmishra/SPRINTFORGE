@@ -780,3 +780,333 @@ def test_every_web_module_solution_passes_its_own_checks(module_id):
     files.update(module["solution_files"])
     outcomes = run_static_checks(files, module.get("checks", []))
     assert [o.id for o in outcomes if not o.passed] == []
+
+
+# --------------------------------------------------------- API client shape
+
+def test_endpoint_pair_accepts_the_names_a_learner_actually_reaches_for():
+    """The check grades the client's shape, not its vocabulary.
+
+    The previous pair of regexes accepted only `list|getAll|fetchAll|load…` for
+    the collection endpoint, so `fetchRecipes()` — the most obvious name, and one
+    the brief never rules out — failed while an unrelated `loadMovies()` left over
+    from an earlier ticket satisfied it without touching the API.
+    """
+    source = """
+const API_BASE_URL = "/api";
+
+async function request(path, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, options);
+  if (!response.ok) {
+    throw new Error(`The service responded with ${response.status}`);
+  }
+  return response.json();
+}
+
+async function fetchRecipes() {
+  return request("/recipes");
+}
+
+async function fetchRecipe(id) {
+  return request(`/recipes/${id}`);
+}
+"""
+    assert verdict(source, "js_endpoint_pair") is True
+
+
+def test_endpoint_pair_rejects_one_function_that_takes_a_path():
+    """The anti-pattern the ticket exists to rule out.
+
+    `request` reaches the network and takes an argument, so on arity alone it
+    reads as a single-item endpoint. There is no collection call, so the module
+    exposes no endpoints at all.
+    """
+    source = """
+const API_BASE_URL = "/api";
+
+async function request(path) {
+  const response = await fetch(`${API_BASE_URL}${path}`);
+  if (!response.ok) {
+    throw new Error(`Request failed with ${response.status}`);
+  }
+  return response.json();
+}
+"""
+    assert verdict(source, "js_endpoint_pair") is False
+
+
+def test_endpoint_pair_rejects_a_client_with_only_a_list_call():
+    """A helper plus a list call is not a pair.
+
+    This is the case arity alone gets wrong: `request(p)` would be counted as the
+    single-item endpoint even though it is the private helper the list call
+    delegates to.
+    """
+    source = """
+const API_BASE_URL = "/api";
+
+async function request(path) {
+  const response = await fetch(`${API_BASE_URL}${path}`);
+  if (!response.ok) {
+    throw new Error(`Request failed with ${response.status}`);
+  }
+  return response.json();
+}
+
+async function listRecipes() {
+  return request("/recipes");
+}
+"""
+    assert verdict(source, "js_endpoint_pair") is False
+
+
+def test_endpoint_pair_rejects_functions_that_never_reach_the_api():
+    """Correctly named and correctly shaped, but reading a local array."""
+    source = """
+const API_BASE_URL = "/api";
+
+function listRecipes() {
+  return recipes;
+}
+
+function getRecipe(id) {
+  return recipes.find((recipe) => recipe.id === id);
+}
+"""
+    assert verdict(source, "js_endpoint_pair") is False
+
+
+# ------------------------------------------------------------- useState pairs
+
+def test_state_pair_accepts_the_hook_spelling_the_starter_hands_you():
+    """`React.useState` is the only spelling available from `import React from "react"`.
+
+    The previous regex required the hook to be written bare and required the state
+    variable to be *named* for what it holds, so the natural port of the starter
+    failed a check its own hint could not have warned about.
+    """
+    assert verdict("const [selectedIds, setSelectedIds] = React.useState([]);", "js_state_pair") is True
+    assert verdict("const [selected, setSelected] = useState(null);", "js_state_pair") is True
+    # The name of the value is not the check's business — `selection_prop`,
+    # `aria_pressed` and `conditional_class` establish what the state means.
+    assert verdict("const [tonight, setTonight] = useState([]);", "js_state_pair") is True
+
+
+def test_state_pair_rejects_a_useState_that_is_never_destructured():
+    """`const s = useState([])` gives you an array, not a value and a setter."""
+    assert verdict("const s = useState([]);", "js_state_pair") is False
+
+
+def test_state_pair_rejects_a_setter_not_named_for_what_it_does():
+    assert verdict("const [selected, change] = useState(null);", "js_state_pair") is False
+
+
+def test_state_pair_rejects_a_different_hook():
+    assert verdict("const [a, setA] = useReducer(reducer, 0);", "js_state_pair") is False
+
+
+# ------------------------------------------- wiring the failure into the UI
+
+def _jsx_verdict(source: str) -> bool:
+    outcome = run_static_checks(
+        {"App.jsx": source},
+        [{"id": "x", "type": "js_catch_sets_state", "file": "App.jsx", "label": "l"}],
+    )[0]
+    return outcome.passed
+
+
+_FETCHING_COMPONENT = """
+import React, { useEffect, useState } from "react";
+
+function App() {
+  const [items, setItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const response = await fetch("/api/items", { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Request failed with ${response.status}`);
+        }
+        setItems(await response.json());
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        __HANDLER__
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    load();
+    return () => controller.abort();
+  }, []);
+
+  if (isLoading) return <p role="status">Loading…</p>;
+  if (error) return <p role="alert">{error}</p>;
+  return <section id="itemList" />;
+}
+
+export default App;
+"""
+
+
+def test_catch_that_only_logs_cannot_pass_the_error_state_requirement():
+    """The false pass this check exists to close.
+
+    A component can declare the error state, render a `role="alert"` branch and
+    still only `console.error()` in the catch. Every check on those three things
+    passes individually while the alert branch is unreachable code, so the user
+    sees a spinner stop and nothing else. Only the wiring between them shows it.
+    """
+    assert _jsx_verdict(_FETCHING_COMPONENT.replace("__HANDLER__", "console.error(error);")) is False
+
+
+def test_catch_that_records_the_failure_passes():
+    assert _jsx_verdict(_FETCHING_COMPONENT.replace("__HANDLER__", "setError(error.message);")) is True
+    # A fixed, friendlier message is a legitimate choice — the check is about the
+    # failure reaching state, not about where the wording comes from.
+    assert _jsx_verdict(_FETCHING_COMPONENT.replace("__HANDLER__", 'setError("We could not load that.");')) is True
+
+
+def test_flipping_a_loading_flag_in_the_catch_is_not_recording_the_failure():
+    assert _jsx_verdict(_FETCHING_COMPONENT.replace("__HANDLER__", "setIsLoading(false);")) is False
+
+
+def test_empty_catch_never_records_the_failure():
+    assert _jsx_verdict(_FETCHING_COMPONENT.replace("__HANDLER__", "")) is False
+
+
+# --------------------------------------------------- REST routes and statuses
+
+def _rest_outcomes(source: str):
+    from app.data.ticket_templates import TICKET_TEMPLATES
+
+    return run_static_checks({"server.js": source}, TICKET_TEMPLATES["rest_api"][0]["checks"])
+
+
+_REAL_SERVER = """
+const express = require("express");
+const app = express();
+app.use(express.json());
+
+let items = [{ id: 1, title: "One", price: 10 }];
+let nextId = 2;
+
+app.get("/api/items", (req, res) => {
+  res.json(items);
+});
+
+app.get("/api/items/:id", (req, res) => {
+  const item = items.find((candidate) => candidate.id === Number(req.params.id));
+  if (!item) {
+    return res.status(404).json({ error: "not found" });
+  }
+  return res.json(item);
+});
+
+app.post("/api/items", (req, res) => {
+  const body = req.body || {};
+  if (typeof body.title !== "string" || body.title.trim() === "") {
+    return res.status(400).json({ error: "title is required" });
+  }
+  const item = { id: nextId, title: body.title.trim(), price: body.price };
+  nextId += 1;
+  items.push(item);
+  return res.status(201).json(item);
+});
+
+module.exports = app;
+"""
+
+
+def test_a_real_rest_implementation_passes_every_check():
+    assert [o.id for o in _rest_outcomes(_REAL_SERVER) if not o.passed] == []
+
+
+def test_three_empty_route_handlers_cannot_pass():
+    """The exact payload that used to score full marks.
+
+    Every route is registered, so the path regexes were satisfied, and the status
+    codes appear in the file, so the bare `404`/`201`/`400` regexes were satisfied
+    too. Nothing answers anything.
+    """
+    source = """
+const express = require("express");
+const app = express();
+app.use(express.json());
+app.get("/api/items", (req, res) => {});
+app.get("/api/items/:id", (req, res) => {});
+app.post("/api/items", (req, res) => {});
+const codes = [404, 201, 400];
+module.exports = app;
+"""
+    failed = {o.id for o in _rest_outcomes(source) if not o.passed}
+    assert {"handlers_implemented", "status_404", "status_201", "status_400"} <= failed
+
+
+def test_status_codes_mentioned_only_in_a_comment_cannot_pass():
+    source = """
+const express = require("express");
+const app = express();
+// documented: 404 when missing, 201 on create, 400 on invalid input
+app.get("/api/items", (req, res) => res.json([]));
+app.get("/api/items/:id", (req, res) => res.json({}));
+app.post("/api/items", (req, res) => res.json({}));
+module.exports = app;
+"""
+    failed = {o.id for o in _rest_outcomes(source) if not o.passed}
+    assert {"status_404", "status_201", "status_400"} <= failed
+
+
+def test_a_route_that_always_answers_404_is_not_a_lookup():
+    """"Returns 404 when missing" is a branch, not the route's only behaviour."""
+    source = """
+const express = require("express");
+const app = express();
+app.get("/api/items", (req, res) => res.json([]));
+app.get("/api/items/:id", (req, res) => res.status(404).json({}));
+app.post("/api/items", (req, res) => res.status(201).json({}));
+module.exports = app;
+"""
+    failed = {o.id for o in _rest_outcomes(source) if not o.passed}
+    assert "status_404" in failed
+    # The happy-path 201 is not required to be conditional.
+    assert "status_201" not in failed
+
+
+# --------------------------------------------------------------- SQL comments
+
+def test_a_schema_of_nothing_but_sql_comments_cannot_pass():
+    """The payload that used to score full marks on the schema ticket.
+
+    `_strip_comments` knew about HTML, `/* */` and `//`, but not SQL's `--`, so
+    every keyword the checks look for could sit in a comment and satisfy them.
+    """
+    from app.data.ticket_templates import TICKET_TEMPLATES
+
+    source = (
+        "-- PRIMARY KEY FOREIGN KEY NOT NULL CREATE INDEX\n"
+        "-- CREATE TABLE recipes CREATE TABLE bookings\n"
+        "SELECT 1;\n"
+    )
+    outcomes = run_static_checks(
+        {"schema.sql": source}, TICKET_TEMPLATES["database_modeling"][0]["checks"]
+    )
+    assert [o.id for o in outcomes if o.passed] == []
+
+
+def test_a_double_dash_inside_a_string_literal_is_not_a_comment():
+    """Stripping has to stop at the quote, or it would eat real DDL."""
+    from app.data.ticket_templates import TICKET_TEMPLATES
+
+    source = (
+        "CREATE TABLE t (a TEXT NOT NULL DEFAULT '-- not a comment');\n"
+        "CREATE TABLE u (id INT PRIMARY KEY, t_a INT REFERENCES t(a));\n"
+        "CREATE INDEX i ON u (t_a);\n"
+    )
+    outcomes = run_static_checks(
+        {"schema.sql": source}, TICKET_TEMPLATES["database_modeling"][0]["checks"]
+    )
+    assert [o.id for o in outcomes if not o.passed] == []

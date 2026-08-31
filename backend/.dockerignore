@@ -1,0 +1,28 @@
+# The 197MB authoring bank. The image only needs the derived store in
+# app/data/cases/, so copying this in would nearly triple the image for a file
+# the API never opens.
+app/data/generated_cases.json
+
+# Local virtualenv and caches: platform-specific, and reinstalled from
+# requirements.txt inside the image anyway.
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+
+# Reinstalled by the Dockerfile, and a host build of these can be for the wrong
+# platform.
+node_modules
+app/tools/js_ast/node_modules
+
+# Local secrets and local state. ENVIRONMENT and DATABASE_URL are supplied to
+# the container, never baked into it.
+.env
+sprintforge.db
+
+# Learner avatar uploads live on a volume, not in the image.
+uploads
+
+# Test suite and one-off verification scripts are not needed to serve requests,
+# and the verify_* scripts import the expensive curriculum source.
+tests

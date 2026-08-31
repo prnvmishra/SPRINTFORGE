@@ -232,7 +232,13 @@ def learning_path(db: Session, twin: LearningDigitalTwin) -> dict[str, Any]:
         "progress": {
             "skills_total": len(steps),
             "skills_verified": verified_count,
-            "percent": (
+            # How much of the route is *done*, which is what the clients label
+            # this as. It used to be the mean confidence across the route, so a
+            # learner sitting just under the threshold on every skill was told
+            # "45% of the route verified" with nothing verified at all.
+            "percent": round(verified_count / len(steps) * 100, 1) if steps else 0.0,
+            # The mean is still worth showing, but under its own name.
+            "mean_confidence": (
                 round(sum(s["confidence"] for s in steps) / len(steps), 1) if steps else 0.0
             ),
         },

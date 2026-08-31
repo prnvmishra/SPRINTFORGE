@@ -77,7 +77,11 @@ def ratio(rows: list[str]) -> tuple[int, int]:
 
 
 def run(source: str, template: dict[str, Any]) -> list[dict[str, Any]]:
-    return [o.to_dict() for o in run_static_checks({"script.js": source}, template["checks"])]
+    # The filename comes from the template: the API client lives in its own
+    # `api.js`, because the DOM-free rule it is graded on can never hold for the
+    # `script.js` the DOM and async tickets fill with `innerHTML`.
+    filename = (template.get("files") or ["script.js"])[0]
+    return [o.to_dict() for o in run_static_checks({filename: source}, template["checks"])]
 
 
 # ------------------------------------------------------------------ the data

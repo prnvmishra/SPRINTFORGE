@@ -1,0 +1,2657 @@
+{
+  "add-and-search-words-data-structure": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "true\ntrue\ntrue\nfalse",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: bad",
+        "stdin": "5 ; addWord bad ; search bad ; search .ad ; search b.. ; search b.\n"
+      },
+      {
+        "expected_stdout": "false\ntrue",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two words",
+        "stdin": "4 ; addWord dad ; addWord mad ; search pad ; search ..d\n"
+      }
+    ]
+  },
+  "add-without-plus": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two positives",
+        "stdin": "2 3\n"
+      },
+      {
+        "expected_stdout": "-4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mixed signs",
+        "stdin": "-7 3\n"
+      }
+    ]
+  },
+  "b75-alien-dictionary": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "wertf",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: wrt wrf er ett rftt",
+        "stdin": "wrt wrf er ett rftt\n"
+      },
+      {
+        "expected_stdout": "abc",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: tie broken smallest",
+        "stdin": "ba bc\n"
+      },
+      {
+        "expected_stdout": "INVALID",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: prefix violation",
+        "stdin": "abc ab\n"
+      },
+      {
+        "expected_stdout": "INVALID",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: direct cycle",
+        "stdin": "a b a\n"
+      }
+    ]
+  },
+  "b75-climbing-stairs": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 2",
+        "stdin": "2\n"
+      },
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 3",
+        "stdin": "3\n"
+      }
+    ]
+  },
+  "b75-coin-change": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: canonical coins",
+        "stdin": "3 11\n1 2 5\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: non-canonical coins",
+        "stdin": "3 6\n1 3 4\n"
+      }
+    ]
+  },
+  "b75-combination-sum-iv": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1 2 3 target 4",
+        "stdin": "3 4\n1 2 3\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: unreachable",
+        "stdin": "1 3\n9\n"
+      }
+    ]
+  },
+  "b75-connected-components": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two components",
+        "stdin": "5 3\n1 2 4\n2 3 5\n"
+      },
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: no edges",
+        "stdin": "4 0\n\n\n"
+      }
+    ]
+  },
+  "b75-course-schedule": {
+    "hidden_count": 9,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: diamond",
+        "stdin": "4 4\n1 1 2 3\n2 3 4 4\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two-cycle",
+        "stdin": "2 2\n1 2\n2 1\n"
+      }
+    ]
+  },
+  "b75-decode-ways": {
+    "hidden_count": 9,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 226",
+        "stdin": "226\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 06",
+        "stdin": "06\n"
+      }
+    ]
+  },
+  "b75-house-robber": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1 2 3 1",
+        "stdin": "4\n1 2 3 1\n"
+      },
+      {
+        "expected_stdout": "12",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 7 9 3 1",
+        "stdin": "5\n2 7 9 3 1\n"
+      }
+    ]
+  },
+  "b75-house-robber-circular": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 3 2",
+        "stdin": "3\n2 3 2\n"
+      },
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1 2 3 1",
+        "stdin": "4\n1 2 3 1\n"
+      }
+    ]
+  },
+  "b75-jump-game": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: reachable",
+        "stdin": "5\n2 3 1 1 4\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: blocked",
+        "stdin": "5\n3 2 1 0 4\n"
+      }
+    ]
+  },
+  "b75-longest-common-subsequence": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: abcde ace",
+        "stdin": "abcde ace\n"
+      },
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: identical",
+        "stdin": "abc abc\n"
+      }
+    ]
+  },
+  "b75-longest-consecutive-sequence": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 100 4 200 1 3 2",
+        "stdin": "6\n100 4 200 1 3 2\n"
+      },
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: duplicate inside run",
+        "stdin": "4\n1 2 2 3\n"
+      }
+    ]
+  },
+  "b75-longest-increasing-subsequence": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mixed",
+        "stdin": "8\n10 9 2 5 3 7 101 18\n"
+      },
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all equal",
+        "stdin": "5\n7 7 7 7 7\n"
+      }
+    ]
+  },
+  "b75-number-of-islands": {
+    "hidden_count": 10,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: three islands",
+        "stdin": "4 5\n1 1 0 0 0\n1 1 0 0 0\n0 0 1 0 0\n0 0 0 1 1\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: diagonal touch",
+        "stdin": "2 2\n1 0\n0 1\n"
+      }
+    ]
+  },
+  "b75-pacific-atlantic-water-flow": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: spiral",
+        "stdin": "3 3\n1 2 3\n8 9 4\n7 6 5\n"
+      },
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 x 2",
+        "stdin": "2 2\n1 2\n3 4\n"
+      }
+    ]
+  },
+  "b75-rotate-image": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "7 4 1\n8 5 2\n9 6 3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 3 x 3",
+        "stdin": "3 3\n1 2 3\n4 5 6\n7 8 9\n"
+      },
+      {
+        "expected_stdout": "3 1\n4 2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 x 2",
+        "stdin": "2 2\n1 2\n3 4\n"
+      }
+    ]
+  },
+  "b75-set-matrix-zeroes": {
+    "hidden_count": 10,
+    "visible": [
+      {
+        "expected_stdout": "1 0 1\n0 0 0\n1 0 1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: centre zero",
+        "stdin": "3 3\n1 1 1\n1 0 1\n1 1 1\n"
+      },
+      {
+        "expected_stdout": "0 0 0\n0 4 5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: corner zero",
+        "stdin": "2 3\n0 1 2\n3 4 5\n"
+      }
+    ]
+  },
+  "b75-spiral-matrix": {
+    "hidden_count": 9,
+    "visible": [
+      {
+        "expected_stdout": "1 2 3 6 9 8 7 4 5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 3 x 3",
+        "stdin": "3 3\n1 2 3\n4 5 6\n7 8 9\n"
+      },
+      {
+        "expected_stdout": "1 2 3 4 8 12 11 10 9 5 6 7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 3 x 4",
+        "stdin": "3 4\n1 2 3 4\n5 6 7 8\n9 10 11 12\n"
+      }
+    ]
+  },
+  "b75-unique-paths": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "28",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 3 x 7",
+        "stdin": "3 7\n"
+      },
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 3 x 2",
+        "stdin": "3 2\n"
+      }
+    ]
+  },
+  "b75-word-break": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: leetcode",
+        "stdin": "leetcode leet code\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: catsandog",
+        "stdin": "catsandog cats dog sand and cat\n"
+      }
+    ]
+  },
+  "basics-c-bitwise-trio": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "8 14 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 12 10",
+        "stdin": "12 10\n"
+      },
+      {
+        "expected_stdout": "0 15 15",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: disjoint bits",
+        "stdin": "7 8\n"
+      }
+    ]
+  },
+  "basics-c-count-vowels": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: Education",
+        "stdin": "Education\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: no vowels",
+        "stdin": "rhythm myths\n"
+      }
+    ]
+  },
+  "basics-c-dynamic-filter": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "3\n5 7 3",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: three kept",
+        "stdin": "5 2\n1 5 2 7 3\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: none kept",
+        "stdin": "3 10\n1 2 3\n"
+      }
+    ]
+  },
+  "basics-c-fibonacci": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 1",
+        "stdin": "1\n"
+      },
+      {
+        "expected_stdout": "13",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 7",
+        "stdin": "7\n"
+      }
+    ]
+  },
+  "basics-c-leap-year": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2024",
+        "stdin": "2024\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1900",
+        "stdin": "1900\n"
+      }
+    ]
+  },
+  "basics-c-matrix-transpose": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1 4\n2 5\n3 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 2 x 3",
+        "stdin": "2 3\n1 2 3\n4 5 6\n"
+      },
+      {
+        "expected_stdout": "-5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 1 x 1",
+        "stdin": "1 1\n-5\n"
+      }
+    ]
+  },
+  "basics-c-max-row-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mixed signs",
+        "stdin": "2 3\n1 2 3\n-4 5 6\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all negative",
+        "stdin": "2 2\n-5 -6\n-1 -2\n"
+      }
+    ]
+  },
+  "basics-c-multiples-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "23",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 10",
+        "stdin": "10\n"
+      },
+      {
+        "expected_stdout": "60",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 16",
+        "stdin": "16\n"
+      }
+    ]
+  },
+  "basics-c-pointer-stride": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "9",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: stride 2",
+        "stdin": "5 2\n1 2 3 4 5\n"
+      },
+      {
+        "expected_stdout": "10",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: stride 1",
+        "stdin": "4 1\n1 2 3 4\n"
+      }
+    ]
+  },
+  "basics-c-reverse-string": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "olleh",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: hello",
+        "stdin": "hello\n"
+      },
+      {
+        "expected_stdout": "dc ba",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two words",
+        "stdin": "ab cd\n"
+      }
+    ]
+  },
+  "basics-c-second-largest": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: duplicates in the middle",
+        "stdin": "5\n3 1 4 4 5\n"
+      },
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all identical",
+        "stdin": "4\n7 7 7 7\n"
+      }
+    ]
+  },
+  "basics-c-sort-three": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "1 2 3",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 3 1 2",
+        "stdin": "3 1 2\n"
+      },
+      {
+        "expected_stdout": "4 5 5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: repeated values",
+        "stdin": "5 5 4\n"
+      }
+    ]
+  },
+  "basics-c-sum-two": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 3",
+        "stdin": "2 3\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative first",
+        "stdin": "-7 4\n"
+      }
+    ]
+  },
+  "basics-c-top-scorer": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "102",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: tie on 90",
+        "stdin": "3\n101 102 103\n50 90 90\n"
+      },
+      {
+        "expected_stdout": "100",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: smaller id appears later",
+        "stdin": "3\n300 100 200\n5 5 1\n"
+      }
+    ]
+  },
+  "basics-c-truncated-mean": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: positive",
+        "stdin": "3\n1 2 4\n"
+      },
+      {
+        "expected_stdout": "-2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative truncates up",
+        "stdin": "4\n-1 -2 -3 -5\n"
+      }
+    ]
+  },
+  "basics-cpp-bitwise-trio": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "8 14 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 12 10",
+        "stdin": "12 10\n"
+      },
+      {
+        "expected_stdout": "0 15 15",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: disjoint bits",
+        "stdin": "7 8\n"
+      }
+    ]
+  },
+  "basics-cpp-count-vowels": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: Education",
+        "stdin": "Education\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: no vowels",
+        "stdin": "rhythm myths\n"
+      }
+    ]
+  },
+  "basics-cpp-dynamic-filter": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "3\n5 7 3",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: three kept",
+        "stdin": "5 2\n1 5 2 7 3\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: none kept",
+        "stdin": "3 10\n1 2 3\n"
+      }
+    ]
+  },
+  "basics-cpp-fibonacci": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 1",
+        "stdin": "1\n"
+      },
+      {
+        "expected_stdout": "13",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 7",
+        "stdin": "7\n"
+      }
+    ]
+  },
+  "basics-cpp-leap-year": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2024",
+        "stdin": "2024\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1900",
+        "stdin": "1900\n"
+      }
+    ]
+  },
+  "basics-cpp-matrix-transpose": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1 4\n2 5\n3 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 2 x 3",
+        "stdin": "2 3\n1 2 3\n4 5 6\n"
+      },
+      {
+        "expected_stdout": "-5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 1 x 1",
+        "stdin": "1 1\n-5\n"
+      }
+    ]
+  },
+  "basics-cpp-max-row-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mixed signs",
+        "stdin": "2 3\n1 2 3\n-4 5 6\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all negative",
+        "stdin": "2 2\n-5 -6\n-1 -2\n"
+      }
+    ]
+  },
+  "basics-cpp-minmax-refs": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1 5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: mixed",
+        "stdin": "5\n3 1 4 1 5\n"
+      },
+      {
+        "expected_stdout": "-9 -2",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: all negative",
+        "stdin": "3\n-7 -2 -9\n"
+      }
+    ]
+  },
+  "basics-cpp-multiples-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "23",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 10",
+        "stdin": "10\n"
+      },
+      {
+        "expected_stdout": "60",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 16",
+        "stdin": "16\n"
+      }
+    ]
+  },
+  "basics-cpp-pointer-stride": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "9",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: stride 2",
+        "stdin": "5 2\n1 2 3 4 5\n"
+      },
+      {
+        "expected_stdout": "10",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: stride 1",
+        "stdin": "4 1\n1 2 3 4\n"
+      }
+    ]
+  },
+  "basics-cpp-reverse-string": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "olleh",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: hello",
+        "stdin": "hello\n"
+      },
+      {
+        "expected_stdout": "dc ba",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two words",
+        "stdin": "ab cd\n"
+      }
+    ]
+  },
+  "basics-cpp-second-largest": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: duplicates in the middle",
+        "stdin": "5\n3 1 4 4 5\n"
+      },
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all identical",
+        "stdin": "4\n7 7 7 7\n"
+      }
+    ]
+  },
+  "basics-cpp-sum-two": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 3",
+        "stdin": "2 3\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative first",
+        "stdin": "-7 4\n"
+      }
+    ]
+  },
+  "basics-cpp-top-scorer": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "102",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: tie on 90",
+        "stdin": "3\n101 102 103\n50 90 90\n"
+      },
+      {
+        "expected_stdout": "100",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: smaller id appears later",
+        "stdin": "3\n300 100 200\n5 5 1\n"
+      }
+    ]
+  },
+  "basics-cpp-truncated-mean": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: positive",
+        "stdin": "3\n1 2 4\n"
+      },
+      {
+        "expected_stdout": "-2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative truncates up",
+        "stdin": "4\n-1 -2 -3 -5\n"
+      }
+    ]
+  },
+  "basics-java-bitwise-trio": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "8 14 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 12 10",
+        "stdin": "12 10\n"
+      },
+      {
+        "expected_stdout": "0 15 15",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: disjoint bits",
+        "stdin": "7 8\n"
+      }
+    ]
+  },
+  "basics-java-case-counts": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "2 8",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: mixed",
+        "stdin": "Hello World 42!\n"
+      },
+      {
+        "expected_stdout": "0 0",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: punctuation between the ranges",
+        "stdin": "[]{}^_`|~\n"
+      }
+    ]
+  },
+  "basics-java-count-vowels": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: Education",
+        "stdin": "Education\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: no vowels",
+        "stdin": "rhythm myths\n"
+      }
+    ]
+  },
+  "basics-java-distinct-in-order": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "4\n4 1 2 5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: four distinct",
+        "stdin": "7\n4 1 4 2 1 5 4\n"
+      },
+      {
+        "expected_stdout": "1\n9",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: one distinct",
+        "stdin": "3\n9 9 9\n"
+      }
+    ]
+  },
+  "basics-java-fibonacci": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 1",
+        "stdin": "1\n"
+      },
+      {
+        "expected_stdout": "13",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 7",
+        "stdin": "7\n"
+      }
+    ]
+  },
+  "basics-java-leap-year": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2024",
+        "stdin": "2024\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1900",
+        "stdin": "1900\n"
+      }
+    ]
+  },
+  "basics-java-matrix-transpose": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1 4\n2 5\n3 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 2 x 3",
+        "stdin": "2 3\n1 2 3\n4 5 6\n"
+      },
+      {
+        "expected_stdout": "-5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 1 x 1",
+        "stdin": "1 1\n-5\n"
+      }
+    ]
+  },
+  "basics-java-max-row-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mixed signs",
+        "stdin": "2 3\n1 2 3\n-4 5 6\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all negative",
+        "stdin": "2 2\n-5 -6\n-1 -2\n"
+      }
+    ]
+  },
+  "basics-java-multiples-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "23",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 10",
+        "stdin": "10\n"
+      },
+      {
+        "expected_stdout": "60",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 16",
+        "stdin": "16\n"
+      }
+    ]
+  },
+  "basics-java-reverse-string": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "olleh",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: hello",
+        "stdin": "hello\n"
+      },
+      {
+        "expected_stdout": "dc ba",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two words",
+        "stdin": "ab cd\n"
+      }
+    ]
+  },
+  "basics-java-reverse-words": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "fox brown quick the",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: four words",
+        "stdin": "the quick brown fox\n"
+      },
+      {
+        "expected_stdout": "abc",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: single word",
+        "stdin": "abc\n"
+      }
+    ]
+  },
+  "basics-java-second-largest": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: duplicates in the middle",
+        "stdin": "5\n3 1 4 4 5\n"
+      },
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all identical",
+        "stdin": "4\n7 7 7 7\n"
+      }
+    ]
+  },
+  "basics-java-sum-two": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 3",
+        "stdin": "2 3\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative first",
+        "stdin": "-7 4\n"
+      }
+    ]
+  },
+  "basics-java-top-scorer": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "102",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: tie on 90",
+        "stdin": "3\n101 102 103\n50 90 90\n"
+      },
+      {
+        "expected_stdout": "100",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: smaller id appears later",
+        "stdin": "3\n300 100 200\n5 5 1\n"
+      }
+    ]
+  },
+  "basics-java-truncated-mean": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: positive",
+        "stdin": "3\n1 2 4\n"
+      },
+      {
+        "expected_stdout": "-2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative truncates up",
+        "stdin": "4\n-1 -2 -3 -5\n"
+      }
+    ]
+  },
+  "basics-py-bitwise-trio": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "8 14 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 12 10",
+        "stdin": "12 10\n"
+      },
+      {
+        "expected_stdout": "0 15 15",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: disjoint bits",
+        "stdin": "7 8\n"
+      }
+    ]
+  },
+  "basics-py-count-vowels": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: Education",
+        "stdin": "Education\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: no vowels",
+        "stdin": "rhythm myths\n"
+      }
+    ]
+  },
+  "basics-py-fibonacci": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 1",
+        "stdin": "1\n"
+      },
+      {
+        "expected_stdout": "13",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 7",
+        "stdin": "7\n"
+      }
+    ]
+  },
+  "basics-py-leap-year": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2024",
+        "stdin": "2024\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1900",
+        "stdin": "1900\n"
+      }
+    ]
+  },
+  "basics-py-matrix-transpose": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "1 4\n2 5\n3 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 2 x 3",
+        "stdin": "2 3\n1 2 3\n4 5 6\n"
+      },
+      {
+        "expected_stdout": "-5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 1 x 1",
+        "stdin": "1 1\n-5\n"
+      }
+    ]
+  },
+  "basics-py-max-row-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mixed signs",
+        "stdin": "2 3\n1 2 3\n-4 5 6\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all negative",
+        "stdin": "2 2\n-5 -6\n-1 -2\n"
+      }
+    ]
+  },
+  "basics-py-mode-value": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: clear winner",
+        "stdin": "7\n4 1 2 4 2 4 1\n"
+      },
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: tie picks the smaller",
+        "stdin": "4\n9 3 9 3\n"
+      }
+    ]
+  },
+  "basics-py-multiples-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "23",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 10",
+        "stdin": "10\n"
+      },
+      {
+        "expected_stdout": "60",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n = 16",
+        "stdin": "16\n"
+      }
+    ]
+  },
+  "basics-py-reverse-string": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "olleh",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: hello",
+        "stdin": "hello\n"
+      },
+      {
+        "expected_stdout": "dc ba",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two words",
+        "stdin": "ab cd\n"
+      }
+    ]
+  },
+  "basics-py-rotate-left": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "3 4 5 1 2",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: rotate by 2",
+        "stdin": "5 2\n1 2 3 4 5\n"
+      },
+      {
+        "expected_stdout": "8 9 7",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: k exceeds n",
+        "stdin": "3 10\n7 8 9\n"
+      }
+    ]
+  },
+  "basics-py-second-largest": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: duplicates in the middle",
+        "stdin": "5\n3 1 4 4 5\n"
+      },
+      {
+        "expected_stdout": "7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all identical",
+        "stdin": "4\n7 7 7 7\n"
+      }
+    ]
+  },
+  "basics-py-slice-halves": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "ace\nbdf",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: abcdef",
+        "stdin": "abcdef\n"
+      },
+      {
+        "expected_stdout": "hlowrd\nel ol",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: with a space",
+        "stdin": "hello world\n"
+      }
+    ]
+  },
+  "basics-py-squares-of-evens": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "20",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 1..5",
+        "stdin": "5\n1 2 3 4 5\n"
+      },
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negatives and zero",
+        "stdin": "4\n-2 -3 0 7\n"
+      }
+    ]
+  },
+  "basics-py-sum-two": {
+    "hidden_count": 4,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 3",
+        "stdin": "2 3\n"
+      },
+      {
+        "expected_stdout": "-3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative first",
+        "stdin": "-7 4\n"
+      }
+    ]
+  },
+  "basics-py-truncated-mean": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: positive",
+        "stdin": "3\n1 2 4\n"
+      },
+      {
+        "expected_stdout": "-2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negative truncates up",
+        "stdin": "4\n-1 -2 -3 -5\n"
+      }
+    ]
+  },
+  "best-time-stock": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: profitable",
+        "stdin": "6\n7 1 5 3 6 4\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: falling prices",
+        "stdin": "5\n7 6 4 3 1\n"
+      }
+    ]
+  },
+  "binary-tree-level-order-traversal": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "3\n9 20\n15 7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: three levels",
+        "stdin": "3 9 20 null null 15 7\n"
+      },
+      {
+        "expected_stdout": "1\n2\n3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: right chain",
+        "stdin": "1 null 2 null 3\n"
+      }
+    ]
+  },
+  "binary-tree-maximum-path-sum": {
+    "hidden_count": 9,
+    "visible": [
+      {
+        "expected_stdout": "6",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: bend at root",
+        "stdin": "1 2 3\n"
+      },
+      {
+        "expected_stdout": "42",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: skip the root",
+        "stdin": "-10 9 20 null null 15 7\n"
+      }
+    ]
+  },
+  "can-attend-all-meetings": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: overlapping",
+        "stdin": "3\n0 5 15\n30 10 20\n"
+      },
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: touching",
+        "stdin": "2\n7 13\n13 20\n"
+      }
+    ]
+  },
+  "combination-sum": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "2 2 3\n7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: target 7",
+        "stdin": "7 | 2 3 6 7\n"
+      },
+      {
+        "expected_stdout": "2 2 2 2\n2 3 3\n3 5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: unsorted candidates",
+        "stdin": "8 | 3 5 2\n"
+      }
+    ]
+  },
+  "construct-tree-from-preorder-and-inorder": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "3 9 20 null null 15 7",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: classic",
+        "stdin": "3 9 20 15 7 | 9 3 15 20 7\n"
+      },
+      {
+        "expected_stdout": "1 2 null 3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: left chain",
+        "stdin": "1 2 3 | 3 2 1\n"
+      }
+    ]
+  },
+  "container-most-water": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "49",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: classic",
+        "stdin": "9\n1 8 6 2 5 4 8 3 7\n"
+      },
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two lines",
+        "stdin": "2\n1 1\n"
+      }
+    ]
+  },
+  "contains-duplicate": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: has duplicate",
+        "stdin": "4\n1 2 3 1\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all distinct",
+        "stdin": "4\n1 2 3 4\n"
+      }
+    ]
+  },
+  "count-palindromic-substrings": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: abc",
+        "stdin": "abc\n"
+      },
+      {
+        "expected_stdout": "6",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: aaa",
+        "stdin": "aaa\n"
+      }
+    ]
+  },
+  "count-set-bits-32": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: eleven",
+        "stdin": "11\n"
+      },
+      {
+        "expected_stdout": "32",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all bits set",
+        "stdin": "4294967295\n"
+      }
+    ]
+  },
+  "counting-bits": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "0 1 1 2 1 2",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: n = 5",
+        "stdin": "5\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: n = 0",
+        "stdin": "0\n"
+      }
+    ]
+  },
+  "decode-encoded-strings": {
+    "hidden_count": 11,
+    "visible": [
+      {
+        "expected_stdout": "3\nab\n\nc#d",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: three strings",
+        "stdin": "2#ab0#3#c#d\n"
+      },
+      {
+        "expected_stdout": "1\na",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: one string",
+        "stdin": "1#a\n"
+      }
+    ]
+  },
+  "find-median-from-data-stream": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "1.5\n2.0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two then three",
+        "stdin": "5 ; add 1 ; add 2 ; median ; add 3 ; median\n"
+      },
+      {
+        "expected_stdout": "-5.0\n-5.5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: negatives",
+        "stdin": "4 ; add -5 ; median ; add -6 ; median\n"
+      }
+    ]
+  },
+  "find-min-rotated": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: rotated twice",
+        "stdin": "5\n3 4 5 1 2\n"
+      },
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: not rotated",
+        "stdin": "4\n1 2 3 4\n"
+      }
+    ]
+  },
+  "first-last-position": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "3 4",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: repeated target",
+        "stdin": "6 8\n5 7 7 8 8 10\n"
+      },
+      {
+        "expected_stdout": "-1 -1",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: absent target",
+        "stdin": "6 6\n5 7 7 8 8 10\n"
+      }
+    ]
+  },
+  "group-anagrams": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "3\n3 ate eat tea\n1 bat\n2 nat tan",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: six words",
+        "stdin": "eat tea tan ate nat bat\n"
+      },
+      {
+        "expected_stdout": "2\n3 abc bca cba\n1 xyz",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: two groups",
+        "stdin": "abc cba bca xyz\n"
+      }
+    ]
+  },
+  "implement-trie-prefix-tree": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "true\nfalse\ntrue",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: apple and app",
+        "stdin": "5 ; insert apple ; search apple ; search app ; startsWith app ; insert app\n"
+      },
+      {
+        "expected_stdout": "false\ntrue\nfalse",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: query before insert",
+        "stdin": "4 ; startsWith a ; insert ab ; search ab ; startsWith abc\n"
+      }
+    ]
+  },
+  "insert-interval": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "2\n1 5\n6 9",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: merges a run",
+        "stdin": "2\n1 6\n3 9\n2 5\n"
+      },
+      {
+        "expected_stdout": "3\n1 2\n5 7\n8 9",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: appended at the end",
+        "stdin": "2\n1 5\n2 7\n8 9\n"
+      }
+    ]
+  },
+  "invert-binary-tree": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4 7 2 9 6 3 1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: perfect tree",
+        "stdin": "4 2 7 1 3 6 9\n"
+      },
+      {
+        "expected_stdout": "1 null 2 null 3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: left chain",
+        "stdin": "1 2 null 3\n"
+      }
+    ]
+  },
+  "koko-eating-bananas": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: eight hours",
+        "stdin": "4 8\n3 6 7 11\n"
+      },
+      {
+        "expected_stdout": "30",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: one hour per pile",
+        "stdin": "3 3\n30 11 23\n"
+      }
+    ]
+  },
+  "kth-smallest-element-in-a-bst": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: smallest",
+        "stdin": "1 | 3 1 4 null 2\n"
+      },
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: third",
+        "stdin": "3 | 5 3 6 2 4 null null 1\n"
+      }
+    ]
+  },
+  "linked-list-cycle-entry": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: cycle at node 1",
+        "stdin": "4\n1 2 3 1\n"
+      },
+      {
+        "expected_stdout": "-1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: no cycle",
+        "stdin": "3\n1 2 -1\n"
+      }
+    ]
+  },
+  "longest-palindrome-length": {
+    "hidden_count": 9,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: babad",
+        "stdin": "babad\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: cbbd",
+        "stdin": "cbbd\n"
+      }
+    ]
+  },
+  "longest-repeat-char-replacement": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: ABAB k=2",
+        "stdin": "ABAB 2\n"
+      },
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: AABABBA k=1",
+        "stdin": "AABABBA 1\n"
+      }
+    ]
+  },
+  "longest-unique-substring": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: abcabcbb",
+        "stdin": "abcabcbb\n"
+      },
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: repeated char",
+        "stdin": "bbbbb\n"
+      }
+    ]
+  },
+  "lowest-common-ancestor-of-a-bst": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "6",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: split at the root",
+        "stdin": "2 8 | 6 2 8 0 4 7 9\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: reversed order, ancestor is one of them",
+        "stdin": "4 2 | 6 2 8 0 4 7 9\n"
+      }
+    ]
+  },
+  "max-product-subarray": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "6",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: 2 3 -2 4",
+        "stdin": "4\n2 3 -2 4\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: zero wins",
+        "stdin": "3\n-2 0 -1\n"
+      }
+    ]
+  },
+  "max-subarray-sum": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "6",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mixed signs",
+        "stdin": "9\n-2 1 -3 4 -1 2 1 -5 4\n"
+      },
+      {
+        "expected_stdout": "-2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: all negative",
+        "stdin": "5\n-8 -3 -6 -2 -5\n"
+      }
+    ]
+  },
+  "maximum-depth-of-binary-tree": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: classic tree",
+        "stdin": "3 9 20 null null 15 7\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: empty tree",
+        "stdin": "null\n"
+      }
+    ]
+  },
+  "merge-intervals": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "3\n1 6\n8 10\n15 18",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: one merge",
+        "stdin": "4\n1 2 8 15\n3 6 10 18\n"
+      },
+      {
+        "expected_stdout": "1\n1 5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: touching",
+        "stdin": "2\n1 4\n4 5\n"
+      }
+    ]
+  },
+  "merge-k-sorted-lists": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "6\n1 1 3 4 4 5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: three lists",
+        "stdin": "3 9\n3 1 4 5\n0\n3 1 3 4\n"
+      },
+      {
+        "expected_stdout": "2\n-8 -8",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: equal singletons",
+        "stdin": "2 4\n1 -8\n1 -8\n"
+      }
+    ]
+  },
+  "merge-two-sorted-lists": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "6\n1 1 2 3 4 4",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: interleaved",
+        "stdin": "3\n1 2 4\n3\n1 3 4\n"
+      },
+      {
+        "expected_stdout": "2\n-5 7",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: first empty",
+        "stdin": "0\n\n2\n-5 7\n"
+      }
+    ]
+  },
+  "min-intervals-to-remove": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: one removal",
+        "stdin": "4\n1 2 3 1\n2 3 4 3\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: identical intervals",
+        "stdin": "3\n1 1 1\n2 2 2\n"
+      }
+    ]
+  },
+  "min-meeting-rooms": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two rooms",
+        "stdin": "3\n0 5 15\n30 10 20\n"
+      },
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: touching meetings",
+        "stdin": "3\n1 2 3\n2 3 4\n"
+      }
+    ]
+  },
+  "min-platforms": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: six trains",
+        "stdin": "6\n900 940 950 1100 1500 1800\n910 1200 1120 1130 1900 2000\n"
+      },
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: same minute",
+        "stdin": "2\n100 200\n100 200\n"
+      }
+    ]
+  },
+  "min-window-substring": {
+    "hidden_count": 9,
+    "visible": [
+      {
+        "expected_stdout": "4",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: ADOBECODEBANC",
+        "stdin": "ADOBECODEBANC ABC\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: repeated letters",
+        "stdin": "aa aa\n"
+      }
+    ]
+  },
+  "missing-number": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: middle missing",
+        "stdin": "3\n3 0 1\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: n missing",
+        "stdin": "2\n0 1\n"
+      }
+    ]
+  },
+  "pairs-with-difference": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: d = 2",
+        "stdin": "5 2\n1 5 3 4 2\n"
+      },
+      {
+        "expected_stdout": "2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: d = 0",
+        "stdin": "6 0\n1 1 2 2 3 4\n"
+      }
+    ]
+  },
+  "product-except-self": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "4\n24 12 8 6",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 1 2 3 4",
+        "stdin": "4\n1 2 3 4\n"
+      },
+      {
+        "expected_stdout": "4\n0 0 3 0",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: one zero",
+        "stdin": "4\n-1 1 0 -3\n"
+      }
+    ]
+  },
+  "remove-nth-from-end": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "4\n1 2 3 5",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: middle node",
+        "stdin": "5\n1 2 3 4 5\n2\n"
+      },
+      {
+        "expected_stdout": "2\n8 9",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: remove head",
+        "stdin": "3\n7 8 9\n3\n"
+      }
+    ]
+  },
+  "reorder-linked-list": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "4\n1 4 2 3",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: even length",
+        "stdin": "4\n1 2 3 4\n"
+      },
+      {
+        "expected_stdout": "5\n1 5 2 4 3",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: odd length",
+        "stdin": "5\n1 2 3 4 5\n"
+      }
+    ]
+  },
+  "reverse-bits-32": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "2147483648",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: lowest bit",
+        "stdin": "1\n"
+      },
+      {
+        "expected_stdout": "964176192",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: leetcode value",
+        "stdin": "43261596\n"
+      }
+    ]
+  },
+  "reverse-linked-list": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "5\n5 4 3 2 1",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: five nodes",
+        "stdin": "5\n1 2 3 4 5\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: empty list",
+        "stdin": "0\n\n"
+      }
+    ]
+  },
+  "same-binary-tree": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "true",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: identical",
+        "stdin": "1 2 3 | 1 2 3\n"
+      },
+      {
+        "expected_stdout": "false",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: mirrored child",
+        "stdin": "1 2 | 1 null 2\n"
+      }
+    ]
+  },
+  "search-rotated": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "2\n4 -1",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: hit and miss",
+        "stdin": "7 2\n4 5 6 7 0 1 2\n0 3\n"
+      },
+      {
+        "expected_stdout": "3\n4 0 2",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: not rotated",
+        "stdin": "5 3\n10 20 30 40 50\n50 10 30\n"
+      }
+    ]
+  },
+  "serialize-and-deserialize-binary-tree": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "1 2 3 null null 4 5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: gaps",
+        "stdin": "1 2 3 null null 4 5\n"
+      },
+      {
+        "expected_stdout": "1 2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: redundant trailing nulls",
+        "stdin": "1 2 null null null\n"
+      }
+    ]
+  },
+  "subsets": {
+    "hidden_count": 5,
+    "visible": [
+      {
+        "expected_stdout": "0\n1 1\n2 1 2\n1 2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: two values",
+        "stdin": "2 | 1 2\n"
+      },
+      {
+        "expected_stdout": "0\n1 1\n2 1 2\n3 1 2 3\n2 1 3\n1 2\n2 2 3\n1 3",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: unsorted input",
+        "stdin": "3 | 3 1 2\n"
+      }
+    ]
+  },
+  "subtree-of-another-tree": {
+    "hidden_count": 10,
+    "visible": [
+      {
+        "expected_stdout": "true",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: present",
+        "stdin": "3 4 5 1 2 | 4 1 2\n"
+      },
+      {
+        "expected_stdout": "false",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: extra grandchild",
+        "stdin": "3 4 5 1 2 null null 0 | 4 1 2\n"
+      }
+    ]
+  },
+  "three-sum": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "2\n-1 -1 2\n-1 0 1",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: classic",
+        "stdin": "6\n-1 0 1 2 -1 -4\n"
+      },
+      {
+        "expected_stdout": "1\n0 0 0",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: four zeros",
+        "stdin": "4\n0 0 0 0\n"
+      }
+    ]
+  },
+  "top-k-frequent-elements": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "1 2",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: clear winner",
+        "stdin": "2 | 1 1 1 2 2 3\n"
+      },
+      {
+        "expected_stdout": "3 5",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: tie broken by value",
+        "stdin": "2 | 5 3 5 3 9 1\n"
+      }
+    ]
+  },
+  "two-sum": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "0 1",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: 2 7 11 15",
+        "stdin": "4 9\n2 7 11 15\n"
+      },
+      {
+        "expected_stdout": "1 2",
+        "hidden": false,
+        "match": "tokens",
+        "name": "sample: no self pairing",
+        "stdin": "3 6\n3 2 4\n"
+      }
+    ]
+  },
+  "valid-anagram": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: anagram",
+        "stdin": "anagram nagaram\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: not an anagram",
+        "stdin": "rat car\n"
+      }
+    ]
+  },
+  "valid-palindrome": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: canal panama",
+        "stdin": "A man, a plan, a canal: Panama\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: race a car",
+        "stdin": "race a car\n"
+      }
+    ]
+  },
+  "valid-parentheses": {
+    "hidden_count": 7,
+    "visible": [
+      {
+        "expected_stdout": "1",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: valid",
+        "stdin": "()[]{}\n"
+      },
+      {
+        "expected_stdout": "0",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: interleaved",
+        "stdin": "([)]\n"
+      }
+    ]
+  },
+  "validate-binary-search-tree": {
+    "hidden_count": 9,
+    "visible": [
+      {
+        "expected_stdout": "true",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: valid",
+        "stdin": "2 1 3\n"
+      },
+      {
+        "expected_stdout": "false",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: invalid grandchild",
+        "stdin": "5 1 4 null null 3 6\n"
+      }
+    ]
+  },
+  "word-search": {
+    "hidden_count": 8,
+    "visible": [
+      {
+        "expected_stdout": "true",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: found",
+        "stdin": "3 4 | abce sfcs adee | abcced\n"
+      },
+      {
+        "expected_stdout": "false",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: needs cell reuse",
+        "stdin": "3 4 | abce sfcs adee | abcb\n"
+      }
+    ]
+  },
+  "word-search-ii": {
+    "hidden_count": 6,
+    "visible": [
+      {
+        "expected_stdout": "eat\noath",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: classic grid",
+        "stdin": "4 4 | oaan etae ihkr iflv | oath pea eat rain\n"
+      },
+      {
+        "expected_stdout": "ab\nabc\nba\ncba",
+        "hidden": false,
+        "match": "trimmed",
+        "name": "sample: single row",
+        "stdin": "1 3 | abc | ab ba abc cba ac\n"
+      }
+    ]
+  }
+}

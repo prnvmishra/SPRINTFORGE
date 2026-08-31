@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 import { AppShell, PageHeader } from "@/components/app-shell";
+import { EngineStage } from "@/components/dashboard/engine-stage";
 import { GoalRoute } from "@/components/dashboard/goal-route";
 import { NeedsWorkList } from "@/components/dashboard/needs-work-list";
 import { PlacementGate } from "@/components/dashboard/placement-gate";
@@ -20,7 +21,7 @@ import {
   StatusPill,
 } from "@/components/ui/primitives";
 import { api } from "@/lib/api";
-import type { Dashboard, LearningPath } from "@/lib/types";
+import type { Adaptations, Dashboard, LearningPath } from "@/lib/types";
 import { errorMessage } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -36,6 +37,14 @@ export default function DashboardPage() {
     queryFn: () => api<LearningPath>("/learning-path"),
   });
 
+  // Only the count is read here — the feed itself lives on the twin page. The
+  // loop strip has to report the real number, since "no changes yet" is a claim
+  // about the learner's history, not a placeholder.
+  const adaptations = useQuery({
+    queryKey: ["adaptations"],
+    queryFn: () => api<Adaptations>("/adaptations"),
+  });
+
   return (
     <AppShell>
       {isLoading ? (
@@ -45,7 +54,7 @@ export default function DashboardPage() {
           {errorMessage(error)}
         </Alert>
       ) : data ? (
-        <DashboardView data={data} path={path} />
+        <DashboardView data={data} path={path} adaptations={adaptations} />
       ) : null}
     </AppShell>
   );
@@ -83,9 +92,11 @@ type QueryLike<T> = { data: T | undefined; isLoading: boolean; error: unknown };
 function DashboardView({
   data,
   path,
+  adaptations,
 }: {
   data: Dashboard;
   path: QueryLike<LearningPath>;
+  adaptations: QueryLike<Adaptations>;
 }) {
   const { twin, rewards, active_project: project, current_ticket: ticket, placement } = data;
   const firstName = data.user.name.split(" ")[0];
@@ -93,6 +104,9 @@ function DashboardView({
     (skill) => skill.confidence >= data.confidence_threshold,
   ).length;
   const placementPending = placement?.required ?? false;
+  // `verified_skills` only holds skills the twin has a signal for, so it is not a
+  // denominator — it would read "5/5" the moment every attempted skill passed.
+  const routeSkillTotal = path.data?.progress.skills_total ?? 0;
 
   return (
     <div className="space-y-8">
@@ -115,8 +129,8 @@ function DashboardView({
             </span>
             <span className="h-2.5 w-px bg-line" />
             <span>
-              <span className="text-ink">{verifiedCount}</span>/{data.verified_skills.length}{" "}
-              skills verified
+              <span className="text-ink">{verifiedCount}</span>
+              {routeSkillTotal > 0 ? `/${routeSkillTotal}` : null} skills verified
             </span>
             {twin.streak_days > 0 ? (
               <>
@@ -138,6 +152,22 @@ function DashboardView({
             </Link>
           </>
         }
+      />
+
+      {/* ------------------------------------------- 0. where you are in the loop */}
+      {/* Orientation before instruction: the strip says which stage produced the
+          recommendation directly beneath it. */}
+      <EngineStage
+        goal={twin.goal}
+        verifiedCount={verifiedCount}
+        totalSkills={routeSkillTotal}
+        weakest={data.skills_needing_improvement[0] ?? null}
+        routeSteps={path.data?.path.length ?? null}
+        projectTitle={project?.title ?? null}
+        ticketKey={ticket?.key ?? null}
+        ticketId={ticket?.id ?? null}
+        adaptationCount={adaptations.data?.events.length ?? null}
+        placementPending={placementPending}
       />
 
       {/* ---------------------------------------------------- 1. placement */}

@@ -25,6 +25,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
+from app.data.curriculum import graded_cases  # noqa: E402
 from app.data.curriculum_blind75_3 import PROBLEMS  # noqa: E402
 from app.schemas.execution import TestCase  # noqa: E402
 from app.services.code_execution_service import (  # noqa: E402
@@ -46,7 +47,7 @@ def _cases(module: dict) -> list[TestCase]:
             hidden=case["hidden"],
             match=case.get("match", "trimmed"),
         )
-        for case in module["test_cases"]
+        for case in graded_cases(module)
     ]
 
 

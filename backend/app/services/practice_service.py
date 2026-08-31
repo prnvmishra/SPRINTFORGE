@@ -7,6 +7,7 @@ from typing import Any, Optional
 
 from sqlalchemy.orm import Session
 
+from app.data.curriculum import graded_cases, hidden_case_count
 from app.data.practice_modules import PRACTICE_MODULE_INDEX, PRACTICE_MODULES
 from app.models import ExecutionAttempt, LearningDigitalTwin, PracticeAttempt
 from app.schemas.ai import EvaluationRequest, EvaluationResult
@@ -192,7 +193,7 @@ def _hidden_total(module: dict[str, Any]) -> int:
     Surfaced to the UI so a learner knows a passing Run is not the whole bar,
     without revealing anything about the cases themselves.
     """
-    hidden = sum(1 for t in module.get("test_cases", []) if t.get("hidden"))
+    hidden = hidden_case_count(module)
     hidden += sum(1 for c in module.get("checks", []) if c.get("hidden"))
     hidden += sum(
         1 for a in (module.get("behaviour") or {}).get("assertions", []) if a.get("hidden")
@@ -265,7 +266,7 @@ async def submit_module(
     language = module.get("language", "text")
 
     if module["kind"] == "challenge":
-        cases = [TestCase(**t) for t in module.get("test_cases", [])]
+        cases = [TestCase(**t) for t in graded_cases(module)]
         service = get_code_execution_service()
         execution = await service.run(module["language"], merged["solution"], cases)
         _record_execution(db, twin.user_id, module_id, module["language"], merged["solution"], execution)
