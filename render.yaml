@@ -16,10 +16,10 @@ services:
       - key: ENVIRONMENT
         value: production
       # Use your existing Neon database (no 90-day limit)
-      # IMPORTANT: Replace this with your actual Neon DATABASE_URL from backend/.env
-      # Your current Neon URL: postgresql://neondb_owner:npg_uaAsG7MbCDY4@ep-mute-dust-axvbv8gr-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      # IMPORTANT: Set DATABASE_URL as environment variable in Render dashboard
+      # NEVER commit actual credentials to git
       - key: DATABASE_URL
-        value: postgresql://neondb_owner:npg_uaAsG7MbCDY4@ep-mute-dust-axvbv8gr-pooler.c-4.us-east-2.aws.neondb?sslmode=require&channel_binding=require
+        value: YOUR_NEON_DATABASE_URL_HERE
       - key: AUTH_SECRET
         generateValue: true
       - key: CORS_ORIGINS
