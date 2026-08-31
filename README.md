@@ -29,7 +29,23 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env
 (cd app/tools/js_ast && npm install)   # acorn, used by the JavaScript validator
+PYTHONPATH=. .venv/bin/python scripts/build_test_cases.py   # once; see below
 .venv/bin/uvicorn app.main:app --reload --port 8000
+```
+
+`build_test_cases.py` produces `app/data/generated_cases.json`, the judge's expected
+outputs for every curriculum problem. It is untracked because it is ~188MB — past the
+100MB file limit a remote will accept — and it is derived data, so the checked-in
+problem definitions remain the single source of truth.
+
+**It runs once per checkout, not on every boot.** The file is written to disk and reused;
+the first build takes around seven minutes because every reference solution is executed
+against full-scale inputs. Rebuild only when you add or edit a problem, and prefer the
+incremental form, which is seconds rather than minutes:
+
+```bash
+PYTHONPATH=. .venv/bin/python scripts/build_test_cases.py --only <slug-prefix>
+PYTHONPATH=. .venv/bin/python scripts/build_test_cases.py --check   # CI: is it stale?
 ```
 
 `app/tools/js_ast` is vendored (its `node_modules` is committed), so a clean checkout
