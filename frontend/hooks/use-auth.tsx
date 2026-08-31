@@ -16,7 +16,7 @@ import { api, ApiError, getToken, setToken } from "@/lib/api";
 import type { AuthResponse, User } from "@/lib/types";
 
 /** How long to wait for the session check before telling the user we cannot reach the API. */
-const SESSION_TIMEOUT_MS = 8000;
+const SESSION_TIMEOUT_MS = 5000;  // Reduced from 8s to 5s for faster feedback
 
 type AuthContextValue = {
   user: User | null;

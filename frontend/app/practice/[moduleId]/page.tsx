@@ -188,7 +188,16 @@ export default function PracticeWorkspacePage() {
   }
 
   if (moduleQuery.isLoading) {
-    return <WorkspaceSkeleton />;
+    return (
+      <AppShell wide>
+        <div className="py-10">
+          <div className="flex items-center gap-3 text-muted">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+            <span className="label">Loading practice module...</span>
+          </div>
+        </div>
+      </AppShell>
+    );
   }
 
   if (moduleQuery.error || !practiceModule) {

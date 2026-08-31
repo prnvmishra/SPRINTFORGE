@@ -13,7 +13,7 @@ export function Providers({ children }: { children: ReactNode }) {
           queries: {
             retry: 1,
             refetchOnWindowFocus: false,
-            staleTime: 10_000,
+            staleTime: 5_000,  // Reduced from 10s to 5s
           },
         },
       }),
