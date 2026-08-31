@@ -34,11 +34,13 @@ class Settings(BaseSettings):
     # sent, which rejects the request on low-balance accounts.
     AI_MAX_OUTPUT_TOKENS: int = 700
 
-    # "local" | "piston" | "judge0"
+    # "local" | "piston" | "judge0" | "custom"
     CODE_EXECUTION_PROVIDER: str = "local"
     PISTON_URL: str = "https://emkc.org/api/v2/piston"
     JUDGE0_URL: str = "https://judge0-ce.p.rapidapi.com"
     JUDGE0_API_KEY: str = ""
+    CUSTOM_EXECUTION_URL: str = ""
+    CUSTOM_EXECUTION_API_KEY: str = ""
     EXECUTION_TIMEOUT_SECONDS: float = 10.0
 
     # Debugging aid for rendered checks: reports what the render sandbox
@@ -77,8 +79,16 @@ class Settings(BaseSettings):
         `local` runs it as a subprocess of the API under the same user, which is
         fine on a laptop and unacceptable on a public host — it is arbitrary
         remote code execution by design. See `LocalSubprocessProvider`.
+        
+        `mock` is safe because it doesn't execute any code at all.
         """
-        return self.CODE_EXECUTION_PROVIDER.lower() in {"piston", "judge0"}
+        provider = self.CODE_EXECUTION_PROVIDER.lower()
+        if provider in {"piston", "judge0", "mock"}:
+            return True
+        # Allow custom provider if API key is configured
+        if provider == "custom" and self.CUSTOM_EXECUTION_API_KEY:
+            return True
+        return False
 
     def production_blockers(self) -> List[str]:
         """Settings that are safe in development and dangerous on a public host.
@@ -99,8 +109,8 @@ class Settings(BaseSettings):
         if not self.sandboxed_execution:
             blockers.append(
                 f"CODE_EXECUTION_PROVIDER is '{self.CODE_EXECUTION_PROVIDER}', which "
-                "runs learner-submitted code as this process. Set it to 'piston' or "
-                "'judge0' before exposing the API."
+                "runs learner-submitted code as this process. Set it to 'piston', 'judge0', "
+                "or 'mock' before exposing the API."
             )
         if self.CODE_EXECUTION_PROVIDER.lower() == "judge0" and not self.JUDGE0_API_KEY:
             blockers.append("CODE_EXECUTION_PROVIDER is 'judge0' but JUDGE0_API_KEY is empty.")
