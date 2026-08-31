@@ -1,0 +1,51 @@
+# ---------------------------------------------------------------- secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ----------------------------------------------------------------- python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --------------------------------------------------------------- database
+*.db
+*.sqlite
+*.sqlite3
+
+# ------------------------------------------------------------------- node
+node_modules/
+# The JS AST tool is vendored so the validator works on a clean checkout.
+!backend/app/tools/js_ast/node_modules/
+.next/
+# Throwaway dist dirs used by isolated verification builds (NEXT_DIST_DIR).
+.next-*/
+out/
+build/
+dist/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+
+# --------------------------------------------------------------------- os
+.DS_Store
+Thumbs.db
+
+# ------------------------------------------------------------------ tools
+.idea/
+.vscode/
+
+# uploaded avatars
+backend/uploads/
+
+# ------------------------------------------------------------- generated
+# 188MB of judge test cases, rebuilt by scripts/build_test_cases.py. Far past
+# the 100MB file limit a remote will accept, and derivable from the curriculum.
+backend/app/data/generated_cases.json

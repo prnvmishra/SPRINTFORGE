@@ -1,0 +1,14 @@
+{
+  "name": "sprintforge-js-ast",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Node helper that parses learner JavaScript into a JSON AST for the deterministic validator.",
+  "main": "parse.js",
+  "scripts": {
+    "parse": "node parse.js"
+  },
+  "dependencies": {
+    "acorn": "^8.12.0",
+    "acorn-jsx": "^5.3.2"
+  }
+}

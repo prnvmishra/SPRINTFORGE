@@ -1,0 +1,37 @@
+# Self-hosted Piston: the sandboxed runtime that grades learner submissions.
+#
+# Untrusted code must never run in the API process. The `local` execution
+# provider exists only for offline development; this compose file is what the
+# judge should point at once submissions come from real users.
+#
+#   docker compose -f docker-compose.judge.yml up -d
+#   ./scripts/install_judge_languages.sh
+#
+# Then in backend/.env:
+#   CODE_EXECUTION_PROVIDER=piston
+#   PISTON_URL=http://localhost:2000/api/v2
+
+services:
+  piston:
+    image: ghcr.io/engineer-man/piston
+    container_name: sprintforge-piston
+    restart: unless-stopped
+    # Piston creates isolated cgroups/namespaces per submission, which needs
+    # privileged mode. That is precisely why it belongs in its own container
+    # rather than inside the API.
+    privileged: true
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston-packages:/piston/packages
+    tmpfs:
+      - /piston/jobs:exec,size=1g
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -qO- http://localhost:2000/api/v2/runtimes || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  piston-packages:

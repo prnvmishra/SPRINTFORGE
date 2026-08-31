@@ -1,0 +1,9 @@
+{
+  "name": "sprintforge-judge-toolchain",
+  "private": true,
+  "description": "Node-side toolchain the judge sandbox needs. The backend is Python; this file exists only so the TypeScript compiler used to grade TypeScript submissions is a pinned, backend-owned dependency rather than something the judge borrows from the frontend or hopes to find on PATH. Install with: cd backend && npm install",
+  "dependencies": {
+    "@types/node": "20.19.9",
+    "typescript": "5.9.3"
+  }
+}

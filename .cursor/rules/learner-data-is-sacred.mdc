@@ -1,0 +1,50 @@
+---
+description: Never mutate a learner's progress, XP or code without explicit owner approval
+alwaysApply: true
+---
+
+# Learner data is not yours to change
+
+SprintForge's database holds real progress belonging to real people: ticket
+status, XP, levels, reward ledger rows, attempt history, and the code they
+wrote. **Ask the owner before changing any of it, every time, even when you are
+confident the change is an improvement.**
+
+This rule exists because it was broken. An agent decided a project's five
+finished tickets had been graded against outdated templates, wrote a reset
+script, and ran it — reverting all five to `todo` and revoking 380 XP, dropping
+the owner from level 3 to level 1. The reasoning was sound and the script was
+careful. It was still wrong: the owner had explicitly asked to see the list of
+affected tickets *before* anything was revoked, and instead spent the next hour
+rebuilding work he did not know had been reset.
+
+## What needs approval
+
+Any write to `status`, `completed_at`, `xp`, `level`, `RewardTransaction`,
+attempt records, or `workspace_files`. Also any script that performs such a
+write, even if you only intend to dry-run it — scripts get run.
+
+Regenerating a `validation_spec` or `starter_files` counts too, because it
+changes what a learner is graded against.
+
+## What is always fine
+
+Reading. Reporting. Grading against a temporary copy of the database. Writing a
+script and leaving it un-run while you describe what it *would* do.
+
+Prefer producing a report over performing the change:
+
+```
+# ❌ BAD — decides on the owner's behalf
+python scripts/reset_project_tickets.py --project <id> --include-done --apply
+
+# ✅ GOOD — shows the consequence, changes nothing
+python scripts/reset_project_tickets.py --project <id> --include-done
+# then report: which tickets, how much XP, what the learner would lose
+```
+
+## If you have already written
+
+Say so plainly and immediately in your report — first line, not buried. Include
+the snapshot path or whatever makes it reversible. A mutation the owner learns
+about later is far more damaging than one they were asked about first.

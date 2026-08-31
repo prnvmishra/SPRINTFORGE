@@ -1,0 +1,777 @@
+{
+  "version": 1,
+  "confidence_threshold": 65,
+  "skills": [
+    {
+      "id": "html_basics",
+      "name": "HTML Basics",
+      "track": "web",
+      "difficulty_weight": 1,
+      "prerequisites": [],
+      "unlocks": [
+        "html_semantics",
+        "css_basics"
+      ],
+      "related_concepts": [
+        "elements",
+        "attributes",
+        "nesting",
+        "forms"
+      ],
+      "recommended_practice": [
+        "html-profile-card"
+      ]
+    },
+    {
+      "id": "html_semantics",
+      "name": "Semantic HTML & Accessibility",
+      "track": "web",
+      "difficulty_weight": 2,
+      "prerequisites": [
+        "html_basics"
+      ],
+      "unlocks": [
+        "js_dom"
+      ],
+      "related_concepts": [
+        "landmarks",
+        "aria",
+        "headings hierarchy",
+        "alt text"
+      ],
+      "recommended_practice": [
+        "html-profile-card"
+      ]
+    },
+    {
+      "id": "css_basics",
+      "name": "CSS Basics",
+      "track": "web",
+      "difficulty_weight": 2,
+      "prerequisites": [
+        "html_basics"
+      ],
+      "unlocks": [
+        "css_layout"
+      ],
+      "related_concepts": [
+        "selectors",
+        "box model",
+        "colors",
+        "specificity"
+      ],
+      "recommended_practice": [
+        "css-profile-card"
+      ]
+    },
+    {
+      "id": "css_layout",
+      "name": "CSS Layout (Flexbox & Grid)",
+      "track": "web",
+      "difficulty_weight": 3,
+      "prerequisites": [
+        "css_basics"
+      ],
+      "unlocks": [
+        "css_responsive"
+      ],
+      "related_concepts": [
+        "flexbox",
+        "grid",
+        "alignment",
+        "spacing"
+      ],
+      "recommended_practice": [
+        "css-profile-card"
+      ]
+    },
+    {
+      "id": "css_responsive",
+      "name": "Responsive Design",
+      "track": "web",
+      "difficulty_weight": 4,
+      "prerequisites": [
+        "css_layout"
+      ],
+      "unlocks": [
+        "react_fundamentals"
+      ],
+      "related_concepts": [
+        "media queries",
+        "fluid units",
+        "mobile first"
+      ],
+      "recommended_practice": [
+        "css-profile-card"
+      ]
+    },
+    {
+      "id": "js_basics",
+      "name": "JavaScript Basics",
+      "track": "web",
+      "difficulty_weight": 2,
+      "prerequisites": [],
+      "unlocks": [
+        "js_functions",
+        "js_dom"
+      ],
+      "related_concepts": [
+        "variables",
+        "types",
+        "operators",
+        "control flow"
+      ],
+      "recommended_practice": [
+        "js-array-rotate"
+      ]
+    },
+    {
+      "id": "js_functions",
+      "name": "Functions & Scope",
+      "track": "web",
+      "difficulty_weight": 3,
+      "prerequisites": [
+        "js_basics"
+      ],
+      "unlocks": [
+        "js_async",
+        "react_fundamentals",
+        "typescript_basics"
+      ],
+      "related_concepts": [
+        "closures",
+        "callbacks",
+        "hoisting",
+        "this"
+      ],
+      "recommended_practice": [
+        "js-array-rotate"
+      ]
+    },
+    {
+      "id": "js_dom",
+      "name": "DOM & Events",
+      "track": "web",
+      "difficulty_weight": 3,
+      "prerequisites": [
+        "js_basics",
+        "html_semantics"
+      ],
+      "unlocks": [
+        "react_fundamentals"
+      ],
+      "related_concepts": [
+        "querySelector",
+        "event listeners",
+        "DOM updates"
+      ],
+      "recommended_practice": [
+        "js-profile-card"
+      ]
+    },
+    {
+      "id": "js_async",
+      "name": "Async JavaScript",
+      "track": "web",
+      "difficulty_weight": 5,
+      "prerequisites": [
+        "js_functions"
+      ],
+      "unlocks": [
+        "js_async_error_handling",
+        "node_basics"
+      ],
+      "related_concepts": [
+        "promises",
+        "async/await",
+        "event loop",
+        "microtasks"
+      ],
+      "recommended_practice": [
+        "js-async-error-handling"
+      ]
+    },
+    {
+      "id": "typescript_basics",
+      "name": "TypeScript Basics",
+      "track": "web",
+      "difficulty_weight": 4,
+      "prerequisites": [
+        "js_functions"
+      ],
+      "unlocks": [],
+      "related_concepts": [
+        "type annotations",
+        "interfaces",
+        "union and literal types",
+        "generics",
+        "type guards",
+        "enums"
+      ],
+      "recommended_practice": [
+        "ts-basics-annotate-totals",
+        "ts-array-rotate"
+      ]
+    },
+    {
+      "id": "js_async_error_handling",
+      "name": "Async Error Handling",
+      "track": "web",
+      "difficulty_weight": 6,
+      "prerequisites": [
+        "js_async"
+      ],
+      "unlocks": [
+        "api_integration"
+      ],
+      "related_concepts": [
+        "try/catch",
+        "promise rejection",
+        "retry",
+        "finally"
+      ],
+      "recommended_practice": [
+        "js-async-error-handling"
+      ]
+    },
+    {
+      "id": "api_integration",
+      "name": "API Integration",
+      "track": "web",
+      "difficulty_weight": 6,
+      "prerequisites": [
+        "js_async_error_handling"
+      ],
+      "unlocks": [
+        "react_data_fetching"
+      ],
+      "related_concepts": [
+        "fetch",
+        "HTTP status codes",
+        "JSON",
+        "loading states"
+      ],
+      "recommended_practice": [
+        "js-async-error-handling"
+      ]
+    },
+    {
+      "id": "react_fundamentals",
+      "name": "React Fundamentals",
+      "track": "web",
+      "difficulty_weight": 4,
+      "prerequisites": [
+        "js_dom",
+        "js_functions",
+        "css_responsive"
+      ],
+      "unlocks": [
+        "react_state"
+      ],
+      "related_concepts": [
+        "JSX",
+        "components",
+        "props",
+        "rendering"
+      ],
+      "recommended_practice": [
+        "react-counter-hook"
+      ]
+    },
+    {
+      "id": "react_state",
+      "name": "React State & Hooks",
+      "track": "web",
+      "difficulty_weight": 5,
+      "prerequisites": [
+        "react_fundamentals"
+      ],
+      "unlocks": [
+        "react_data_fetching"
+      ],
+      "related_concepts": [
+        "useState",
+        "useEffect",
+        "lifting state",
+        "immutability"
+      ],
+      "recommended_practice": [
+        "react-counter-hook"
+      ]
+    },
+    {
+      "id": "react_data_fetching",
+      "name": "React Data Fetching",
+      "track": "web",
+      "difficulty_weight": 7,
+      "prerequisites": [
+        "react_state",
+        "api_integration"
+      ],
+      "unlocks": [
+        "react_dashboard"
+      ],
+      "related_concepts": [
+        "effects",
+        "loading/error states",
+        "cleanup",
+        "caching"
+      ],
+      "recommended_practice": [
+        "react-counter-hook",
+        "js-async-error-handling"
+      ]
+    },
+    {
+      "id": "react_dashboard",
+      "name": "React Application Architecture",
+      "track": "web",
+      "difficulty_weight": 8,
+      "prerequisites": [
+        "react_data_fetching"
+      ],
+      "unlocks": [],
+      "related_concepts": [
+        "routing",
+        "composition",
+        "state architecture"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "node_basics",
+      "name": "Node.js Basics",
+      "track": "backend",
+      "difficulty_weight": 5,
+      "prerequisites": [
+        "js_async"
+      ],
+      "unlocks": [
+        "rest_api"
+      ],
+      "related_concepts": [
+        "modules",
+        "npm",
+        "runtime",
+        "streams"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "rest_api",
+      "name": "REST API Design",
+      "track": "backend",
+      "difficulty_weight": 6,
+      "prerequisites": [
+        "node_basics"
+      ],
+      "unlocks": [
+        "database_modeling"
+      ],
+      "related_concepts": [
+        "routes",
+        "status codes",
+        "validation",
+        "middleware"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "database_modeling",
+      "name": "Database Modeling",
+      "track": "backend",
+      "difficulty_weight": 6,
+      "prerequisites": [
+        "rest_api"
+      ],
+      "unlocks": [],
+      "related_concepts": [
+        "schemas",
+        "relations",
+        "indexes",
+        "migrations"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "python_basics",
+      "name": "Python Basics",
+      "track": "language",
+      "difficulty_weight": 2,
+      "prerequisites": [],
+      "unlocks": [
+        "data_cleaning",
+        "dsa_arrays"
+      ],
+      "related_concepts": [
+        "types",
+        "lists",
+        "loops",
+        "functions",
+        "strings",
+        "dicts",
+        "slicing",
+        "comprehensions"
+      ],
+      "recommended_practice": [
+        "cp-basics-py-sum-two-python",
+        "cp-basics-py-second-largest-python",
+        "cp-basics-py-mode-value-python",
+        "py-array-rotate"
+      ]
+    },
+    {
+      "id": "dsa_arrays",
+      "name": "Arrays & Algorithms",
+      "track": "language",
+      "difficulty_weight": 4,
+      "prerequisites": [
+        "python_basics",
+        "java_basics",
+        "c_basics",
+        "cpp_basics"
+      ],
+      "unlocks": [],
+      "related_concepts": [
+        "indexing",
+        "two pointers",
+        "complexity",
+        "edge cases"
+      ],
+      "recommended_practice": [
+        "py-array-rotate",
+        "js-array-rotate",
+        "cpp-array-rotate",
+        "java-array-rotate",
+        "c-array-rotate"
+      ]
+    },
+    {
+      "id": "java_basics",
+      "name": "Java Basics",
+      "track": "language",
+      "difficulty_weight": 3,
+      "prerequisites": [],
+      "unlocks": [
+        "dsa_arrays"
+      ],
+      "related_concepts": [
+        "classes",
+        "types",
+        "arrays",
+        "streams",
+        "objects",
+        "ArrayList",
+        "strings"
+      ],
+      "recommended_practice": [
+        "cp-basics-java-sum-two-java",
+        "cp-basics-java-top-scorer-java",
+        "cp-basics-java-distinct-in-order-java",
+        "java-array-rotate"
+      ]
+    },
+    {
+      "id": "c_basics",
+      "name": "C Basics",
+      "track": "language",
+      "difficulty_weight": 4,
+      "prerequisites": [],
+      "unlocks": [
+        "dsa_arrays"
+      ],
+      "related_concepts": [
+        "pointers",
+        "memory",
+        "arrays",
+        "stdio",
+        "pointer arithmetic",
+        "structs",
+        "strings"
+      ],
+      "recommended_practice": [
+        "cp-basics-c-sum-two-c",
+        "cp-basics-c-sort-three-c",
+        "cp-basics-c-pointer-stride-c",
+        "cp-basics-c-dynamic-filter-c",
+        "c-array-rotate"
+      ]
+    },
+    {
+      "id": "cpp_basics",
+      "name": "C++ Basics",
+      "track": "language",
+      "difficulty_weight": 4,
+      "prerequisites": [],
+      "unlocks": [
+        "dsa_arrays"
+      ],
+      "related_concepts": [
+        "vectors",
+        "iterators",
+        "STL",
+        "references",
+        "pointers",
+        "classes",
+        "strings"
+      ],
+      "recommended_practice": [
+        "cp-basics-cpp-sum-two-cpp",
+        "cp-basics-cpp-minmax-refs-cpp",
+        "cp-basics-cpp-pointer-stride-cpp",
+        "cp-basics-cpp-dynamic-filter-cpp",
+        "cpp-array-rotate"
+      ]
+    },
+    {
+      "id": "sql_basics",
+      "name": "SQL Fundamentals",
+      "track": "data",
+      "difficulty_weight": 2,
+      "prerequisites": [],
+      "unlocks": [
+        "sql_joins",
+        "sql_aggregation"
+      ],
+      "related_concepts": [
+        "select",
+        "where",
+        "order by",
+        "null handling",
+        "distinct"
+      ],
+      "recommended_practice": [
+        "sql-customer-filter"
+      ]
+    },
+    {
+      "id": "sql_joins",
+      "name": "SQL Joins & Multi-table Queries",
+      "track": "data",
+      "difficulty_weight": 4,
+      "prerequisites": [
+        "sql_basics"
+      ],
+      "unlocks": [
+        "sql_analytics"
+      ],
+      "related_concepts": [
+        "inner join",
+        "left join",
+        "join keys",
+        "fan-out",
+        "cardinality"
+      ],
+      "recommended_practice": [
+        "sql-revenue-by-city"
+      ]
+    },
+    {
+      "id": "sql_aggregation",
+      "name": "SQL Aggregation & Grouping",
+      "track": "data",
+      "difficulty_weight": 4,
+      "prerequisites": [
+        "sql_basics"
+      ],
+      "unlocks": [
+        "sql_analytics",
+        "data_cleaning"
+      ],
+      "related_concepts": [
+        "group by",
+        "having",
+        "count",
+        "sum",
+        "average"
+      ],
+      "recommended_practice": [
+        "sql-revenue-by-city"
+      ]
+    },
+    {
+      "id": "sql_analytics",
+      "name": "Subqueries, CTEs & Window Functions",
+      "track": "data",
+      "difficulty_weight": 6,
+      "prerequisites": [
+        "sql_joins",
+        "sql_aggregation"
+      ],
+      "unlocks": [
+        "exploratory_analysis"
+      ],
+      "related_concepts": [
+        "cte",
+        "subquery",
+        "window function",
+        "ranking",
+        "running total"
+      ],
+      "recommended_practice": [
+        "sql-top-product-per-city"
+      ]
+    },
+    {
+      "id": "data_cleaning",
+      "name": "Data Cleaning & Validation",
+      "track": "data",
+      "difficulty_weight": 5,
+      "prerequisites": [
+        "sql_aggregation",
+        "python_basics"
+      ],
+      "unlocks": [
+        "exploratory_analysis"
+      ],
+      "related_concepts": [
+        "missing values",
+        "duplicates",
+        "type coercion",
+        "outliers",
+        "data types"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "exploratory_analysis",
+      "name": "Exploratory Data Analysis",
+      "track": "data",
+      "difficulty_weight": 6,
+      "prerequisites": [
+        "sql_analytics",
+        "data_cleaning"
+      ],
+      "unlocks": [
+        "statistics_business",
+        "data_visualization"
+      ],
+      "related_concepts": [
+        "distribution",
+        "segmentation",
+        "pivot",
+        "correlation",
+        "cohort"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "statistics_business",
+      "name": "Statistics for Business Questions",
+      "track": "data",
+      "difficulty_weight": 7,
+      "prerequisites": [
+        "exploratory_analysis"
+      ],
+      "unlocks": [
+        "dashboard_design"
+      ],
+      "related_concepts": [
+        "mean vs median",
+        "variance",
+        "sampling",
+        "significance",
+        "confidence interval",
+        "a/b test"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "data_visualization",
+      "name": "Data Visualisation",
+      "track": "data",
+      "difficulty_weight": 5,
+      "prerequisites": [
+        "exploratory_analysis"
+      ],
+      "unlocks": [
+        "dashboard_design"
+      ],
+      "related_concepts": [
+        "chart choice",
+        "encoding",
+        "axis truncation",
+        "colour scales",
+        "annotation"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "dashboard_design",
+      "name": "Dashboards & Data Storytelling",
+      "track": "data",
+      "difficulty_weight": 7,
+      "prerequisites": [
+        "data_visualization",
+        "statistics_business"
+      ],
+      "unlocks": [],
+      "related_concepts": [
+        "kpi",
+        "drill-down",
+        "audience",
+        "narrative",
+        "dashboard layout"
+      ],
+      "recommended_practice": []
+    },
+    {
+      "id": "spreadsheet_modeling",
+      "name": "Spreadsheet Modelling",
+      "track": "data",
+      "difficulty_weight": 3,
+      "prerequisites": [],
+      "unlocks": [],
+      "related_concepts": [
+        "formulas",
+        "lookup",
+        "pivot table",
+        "absolute reference",
+        "scenario model"
+      ],
+      "recommended_practice": []
+    }
+  ],
+  "concept_to_skill": {
+    "promise rejection": "js_async_error_handling",
+    "async error handling": "js_async_error_handling",
+    "try/catch": "js_async_error_handling",
+    "event loop": "js_async",
+    "promises": "js_async",
+    "closures": "js_functions",
+    "event listeners": "js_dom",
+    "fetch": "api_integration",
+    "loading states": "react_data_fetching",
+    "useEffect": "react_state",
+    "useState": "react_state",
+    "flexbox": "css_layout",
+    "media queries": "css_responsive",
+    "semantic html": "html_semantics",
+    "edge cases": "dsa_arrays",
+    "null handling": "sql_basics",
+    "left join": "sql_joins",
+    "inner join": "sql_joins",
+    "join keys": "sql_joins",
+    "group by": "sql_aggregation",
+    "having": "sql_aggregation",
+    "window function": "sql_analytics",
+    "running total": "sql_analytics",
+    "missing values": "data_cleaning",
+    "duplicates": "data_cleaning",
+    "distribution": "exploratory_analysis",
+    "significance": "statistics_business",
+    "mean vs median": "statistics_business",
+    "chart choice": "data_visualization",
+    "axis truncation": "data_visualization",
+    "dashboard layout": "dashboard_design",
+    "pivot table": "spreadsheet_modeling",
+    "type annotations": "typescript_basics",
+    "interfaces": "typescript_basics",
+    "type aliases": "typescript_basics",
+    "generics": "typescript_basics",
+    "union types": "typescript_basics",
+    "type guards": "typescript_basics",
+    "enums": "typescript_basics",
+    "typescript": "typescript_basics"
+  }
+}

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aurora Recipe Studio</title>
+    <style>
+/* Aurora Recipe Studio — stylesheet.
+   Tokens first, then the page shell, then the components. Every colour and
+   radius resolves through a token, so the theme re-skins from :root alone. */
+
+/* 1. Design tokens ----------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --surface: #0f1115;
+  --surface-raised: #171a21;
+  --border: #262b36;
+  --text: #eef1f6;
+  --muted: #a2abbd;
+  --accent: #ffb057;
+  --radius: 14px;
+  --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* 2. Page shell -------------------------------------------------------- */
+body {
+  margin: 0;
+  background-color: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* 3. Header bar -------------------------------------------------------- */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 32px;
+  background-color: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* 4. Primary navigation ------------------------------------------------ */
+nav ul {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+nav a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+nav a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+/* 5. Hero -------------------------------------------------------------- */
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#hero {
+  padding: 72px 32px 56px;
+  text-align: center;
+}
+
+#hero h2 {
+  margin: 0 0 16px;
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+#hero p {
+  max-width: 56ch;
+  margin: 0 auto 40px;
+  color: var(--muted);
+  font-size: 18px;
+}
+
+#hero img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 7;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+/* 7. Footer ------------------------------------------------------------ */
+footer {
+  padding: 32px;
+  border-top: 1px solid var(--border);
+  background-color: var(--surface-raised);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+footer p {
+  margin: 0;
+}
+
+
+/* 8. Recipe grid ------------------------------------------------------- */
+#recipeList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  padding: 0 32px 72px;
+}
+
+#recipeList h2 {
+  grid-column: 1 / -1;
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 650;
+  color: var(--text);
+}
+
+/* 9. Recipe card ------------------------------------------------------- */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+  border-color: var(--accent);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 620;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+
+/* 10. Small screens ---------------------------------------------------- */
+@media (max-width: 640px) {
+  header {
+    padding: 14px 20px;
+  }
+
+  nav ul {
+    gap: 18px;
+  }
+
+  #hero {
+    padding: 40px 20px 32px;
+  }
+
+  #recipeList {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 20px 48px;
+  }
+
+  footer {
+    padding: 24px 20px;
+  }
+}
+
+</style>
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Aurora Recipe Studio</h1>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="#recipeList">Browse</a></li>
+          <li><a class="site-nav__link" href="#bookings">My Bookings</a></li>
+          <li><a class="site-nav__link" href="#account">Account</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="app">
+      <section id="hero" class="hero">
+        <h2>Cook something worth remembering</h2>
+        <p class="hero__tagline">
+          Curated recipes from working chefs, filtered to what you actually have
+          in the kitchen tonight.
+        </p>
+        <img
+          class="hero__image"
+          src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80"
+          alt="Roasted vegetables and herbs plated on a dark ceramic dish"
+          width="1600"
+          height="900"
+        />
+      </section>
+
+      <section id="recipeList" class="recipe-list">
+        <h2>Tonight's picks</h2>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 Aurora Recipe Studio. Cook boldly.</p>
+    </footer>
+
+    <script>
+// Aurora Recipe Studio client script.
+// Sample data you can render until the API ticket is unlocked. Each item ships a
+// poster URL, so the cards can show real artwork instead of text-only boxes.
+//
+// The stylesheet targets this card shape, so keep the element names when you
+// build the markup — otherwise the styling ticket's rules will not apply:
+//
+//   <article class="card">
+//     <img src="..." alt="Poster for ...">
+//     <h3>Title</h3>
+//     <p>Genre &middot; rating</p>
+//     <p class="price">From Rs 320</p>
+//   </article>
+const recipes = [
+  {
+    id: 1,
+    title: "Sample One",
+    genre: "Drama",
+    rating: 4.6,
+    price: 12,
+    poster: "https://picsum.photos/seed/recipe-1/400/600",
+  },
+  {
+    id: 2,
+    title: "Sample Two",
+    genre: "Thriller",
+    rating: 4.2,
+    price: 15,
+    poster: "https://picsum.photos/seed/recipe-2/400/600",
+  },
+  {
+    id: 3,
+    title: "Sample Three",
+    genre: "Comedy",
+    rating: 4.8,
+    price: 10,
+    poster: "https://picsum.photos/seed/recipe-3/400/600",
+  },
+  {
+    id: 4,
+    title: "Sample Four",
+    genre: "Documentary",
+    rating: 4.4,
+    price: 11,
+    poster: "https://picsum.photos/seed/recipe-4/400/600",
+  },
+  {
+    id: 5,
+    title: "Sample Five",
+    genre: "Animation",
+    rating: 4.7,
+    price: 13,
+    poster: "https://picsum.photos/seed/recipe-5/400/600",
+  },
+  {
+    id: 6,
+    title: "Sample Six",
+    genre: "Action",
+    rating: 4.1,
+    price: 14,
+    poster: "https://picsum.photos/seed/recipe-6/400/600",
+  },
+];
+
+// Implement the ticket requirements below.
+
+// --- Display formatting ---------------------------------------------------
+// Each function is pure: data in, display string out. No DOM, no globals, so
+// each one can be exercised on its own.
+
+const CURRENCY = "Rs";
+const RATING_SCALE = 10;
+const UNKNOWN = "Not available";
+
+/** True only for a real, finite number — rules out NaN, Infinity and "abc". */
+function isFiniteNumber(value) {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+/** Coerces loose input (a numeric string from an API) to a finite number. */
+function toFiniteNumber(value) {
+  if (isFiniteNumber(value)) {
+    return value;
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return null;
+}
+
+function formatPrice(value) {
+  const amount = toFiniteNumber(value);
+  if (amount === null) {
+    return UNKNOWN;
+  }
+  return `${CURRENCY} ${amount.toFixed(0)}`;
+}
+
+function formatRating(value) {
+  const rating = toFiniteNumber(value);
+  if (rating === null) {
+    return UNKNOWN;
+  }
+  return `${rating.toFixed(1)}/${RATING_SCALE}`;
+}
+
+function formatMeta(item) {
+  const source = item !== null && typeof item === "object" ? item : {};
+  const genre = typeof source.genre === "string" && source.genre.trim() !== ""
+    ? source.genre
+    : UNKNOWN;
+  return `${genre} · ${formatRating(source.rating)}`;
+}
+
+function truncate(text, limit) {
+  const value = typeof text === "string" ? text : "";
+  const max = toFiniteNumber(limit);
+  if (max === null || max <= 0 || value.length <= max) {
+    return value;
+  }
+  return `${value.slice(0, max - 1).trimEnd()}…`;
+}
+
+// --- Filtering, sorting and summarising -----------------------------------
+// All pure: they read the array they are given and return a new one. Nothing
+// here sorts in place, so a caller holding the source list keeps its order.
+
+const ALL_GENRES = "all";
+
+function filterByGenre(items, genre) {
+  const list = Array.isArray(items) ? items : [];
+  const wanted = typeof genre === "string" ? genre.trim() : "";
+  if (wanted === "" || wanted.toLowerCase() === ALL_GENRES) {
+    return list.slice();
+  }
+  return list.filter(
+    (item) => String(item.genre).toLowerCase() === wanted.toLowerCase(),
+  );
+}
+
+function sortByRating(items) {
+  const list = Array.isArray(items) ? items : [];
+  // slice() first: sort() mutates, and the source list belongs to the caller.
+  return list.slice().sort((a, b) => toFiniteNumber(b.rating) - toFiniteNumber(a.rating));
+}
+
+function summarise(items) {
+  const list = Array.isArray(items) ? items : [];
+  if (list.length === 0) {
+    return "No recipes to show yet";
+  }
+  const total = list.reduce((sum, item) => sum + (toFiniteNumber(item.rating) ?? 0), 0);
+  const average = total / list.length;
+  const noun = list.length === 1 ? "recipe" : "recipes";
+  return `${list.length} ${noun} · average rating ${average.toFixed(1)}/${RATING_SCALE}`;
+}
+
+// --- Rendering ------------------------------------------------------------
+// The card shape matches the stylesheet: <article class="card"> wrapping the
+// poster, an <h3> title, a meta line and a price line.
+
+const listContainer = document.querySelector("#recipeList");
+
+function createCard(item) {
+  const card = document.createElement("article");
+  card.className = "card";
+  card.dataset.id = String(item.id);
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
+  card.setAttribute("aria-pressed", "false");
+
+  const poster = document.createElement("img");
+  poster.src = item.poster;
+  poster.alt = `Poster for ${item.title}`;
+  poster.loading = "lazy";
+  card.append(poster);
+
+  const title = document.createElement("h3");
+  title.textContent = truncate(item.title, 40);
+  card.append(title);
+
+  const meta = document.createElement("p");
+  meta.textContent = formatMeta(item);
+  card.append(meta);
+
+  const price = document.createElement("p");
+  price.className = "price";
+  price.textContent = `From ${formatPrice(item.price)}`;
+  card.append(price);
+
+  return card;
+}
+
+function renderRecipes(items) {
+  if (listContainer === null) {
+    return;
+  }
+  // One fragment, one reflow, and the heading the markup already owns survives.
+  const fragment = document.createDocumentFragment();
+  items.forEach((item) => fragment.append(createCard(item)));
+  clearList();
+  listContainer.append(fragment);
+}
+
+
+// --- Selection ------------------------------------------------------------
+// One delegated listener on the container, so cards rendered later are handled
+// without re-binding anything.
+
+const selectionState = { item: null, cardId: null };
+
+const selectionSummary = document.createElement("p");
+selectionSummary.className = "selection-summary";
+selectionSummary.setAttribute("aria-live", "polite");
+selectionSummary.textContent = "No recipe selected yet";
+if (listContainer !== null && listContainer.parentNode) {
+  listContainer.parentNode.insertBefore(selectionSummary, listContainer);
+}
+
+function renderSelection() {
+  selectionSummary.textContent = selectionState.item === null
+    ? "No recipe selected yet"
+    : `Selected: ${selectionState.item.title} — ${formatPrice(selectionState.item.price)}`;
+}
+
+function selectCard(card) {
+  const id = Number(card.dataset.id);
+  const item = recipes.find((recipe) => recipe.id === id);
+  if (item === undefined) {
+    return;
+  }
+
+  // Only ever one active card, so clear the previous one before marking this.
+  if (selectionState.cardId !== null) {
+    const previous = listContainer.querySelector(`.card[data-id="${selectionState.cardId}"]`);
+    if (previous !== null) {
+      previous.classList.remove("selected");
+      previous.setAttribute("aria-pressed", "false");
+    }
+  }
+
+  card.classList.add("selected");
+  card.setAttribute("aria-pressed", "true");
+  selectionState.item = item;
+  selectionState.cardId = id;
+  renderSelection();
+}
+
+if (listContainer !== null) {
+  listContainer.addEventListener("click", (event) => {
+    const card = event.target.closest(".card");
+    if (card === null) {
+      return;
+    }
+    selectCard(card);
+  });
+}
+
+renderSelection();
+
+// --- Async loading with failure handling ----------------------------------
+// The loading state is painted before the request and replaced however the
+// request settles: cards, an empty message, or an error with a retry.
+
+const API_URL = "/api/recipes";
+
+let renderedCards = [];
+
+const statusNode = document.createElement("p");
+statusNode.className = "list-status";
+
+function setStatus(message) {
+  statusNode.textContent = message;
+  if (message === "") {
+    statusNode.remove();
+  } else if (listContainer !== null) {
+    listContainer.append(statusNode);
+  }
+}
+
+function clearList() {
+  renderedCards.forEach((card) => card.remove());
+  renderedCards = [];
+  setStatus("");
+}
+
+async function loadRecipes() {
+  // Loading, painted before the request goes out.
+  clearList();
+  setStatus("Loading recipes…");
+
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      // Thrown before the body is touched: a 500 page is not recipe JSON.
+      throw new Error(`The recipe service responded with ${response.status}`);
+    }
+    const payload = await response.json();
+    const items = Array.isArray(payload) ? payload : (payload.recipes ?? []);
+
+    clearList();
+    if (items.length === 0) {
+      setStatus("No recipes match right now — try another cuisine.");
+      return items;
+    }
+    items.forEach((item) => {
+      const card = createCard(item);
+      renderedCards.push(card);
+      listContainer.append(card);
+    });
+    return items;
+  } catch (error) {
+    // The loading state must not survive a failure either.
+    clearList();
+    listContainer.insertAdjacentHTML(
+      "beforeend",
+      `<div class="list-error" role="alert">
+         <p>We could not load the recipes. ${error.message}</p>
+         <button type="button" class="retry">Try again</button>
+       </div>`,
+    );
+    return [];
+  }
+}
+
+if (listContainer !== null) {
+  listContainer.addEventListener("click", (event) => {
+    const retry = event.target.closest(".retry");
+    if (retry === null) {
+      return;
+    }
+    loadRecipes();
+  });
+}
+
+loadRecipes();
+
+</script>
+  </body>
+</html>
