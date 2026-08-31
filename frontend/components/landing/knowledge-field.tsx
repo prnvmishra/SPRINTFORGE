@@ -381,7 +381,7 @@ export function KnowledgeField({ className }: { className?: string }) {
         if (alpha <= 0.012) continue;
 
         ctx.globalAlpha = alpha;
-        ctx.drawImage(sprite, point.sx - size / 2, point.sy - size / 2, size, size);
+        ctx.drawImage(sprite as CanvasImageSource, point.sx - size / 2, point.sy - size / 2, size, size);
 
         if (verified && defocus < 0.5) {
           // Anamorphic streak. Only in-focus highlights throw one, which is
@@ -424,7 +424,7 @@ export function KnowledgeField({ className }: { className?: string }) {
       const oy = Math.random() * GRAIN_TILE;
       for (let x = -ox; x < width; x += GRAIN_TILE) {
         for (let y = -oy; y < height; y += GRAIN_TILE) {
-          ctx.drawImage(grain, x, y);
+          ctx.drawImage(grain as CanvasImageSource, x, y);
         }
       }
       ctx.globalAlpha = 1;

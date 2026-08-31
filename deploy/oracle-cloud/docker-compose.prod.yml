@@ -1,0 +1,64 @@
+# Production Docker Compose for Oracle Cloud
+# This runs both backend API and Piston code execution
+version: '3.8'
+
+services:
+  sprintforge-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sprintforge-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=${DATABASE_URL}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - CORS_ORIGIN_REGEX=
+      - AI_PROVIDER=${AI_PROVIDER:-mock}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.6-flash}
+      - CODE_EXECUTION_PROVIDER=piston
+      - PISTON_URL=http://piston:2000/api/v2
+      - EXECUTION_TIMEOUT_SECONDS=10
+    volumes:
+      - ./backend/app/data/cases:/app/app/data/cases:ro
+    depends_on:
+      - piston
+    networks:
+      - sprintforge-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  piston:
+    image: ghcr.io/engineer-man/piston
+    container_name: sprintforge-piston
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "2000:2000"
+    volumes:
+      - piston-packages:/piston/packages
+    tmpfs:
+      - /piston/jobs:exec,size=1g
+    networks:
+      - sprintforge-network
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -qO- http://localhost:2000/api/v2/runtimes || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+networks:
+  sprintforge-network:
+    driver: bridge
+
+volumes:
+  piston-packages:
