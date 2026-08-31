@@ -46,13 +46,12 @@ RUN cd app/tools/js_ast && npm install --omit=dev
 
 COPY . .
 
-# Fail at build time rather than on a learner's first submission if the case
-# store was not supplied. `graded_cases` raises a clear error either way, but a
-# broken image should not reach a demo.
+# For cloud deployment, only check for visible.json and modules.json
+# Hidden cases are built separately due to size (76MB) and build time (7+ minutes)
+# For production deployment, hidden cases should be provided via volume or separate build
 RUN python -c "import pathlib, sys; \
     p = pathlib.Path('app/data/cases'); \
     missing = [n for n in ('visible.json', 'modules.json') if not (p / n).exists()]; \
-    missing += [] if list((p / 'hidden').glob('*.json.gz')) else ['hidden/']; \
     sys.exit('Case store incomplete: ' + ', '.join(missing) + \
     '. Run scripts/build_test_cases.py, scripts/split_case_bank.py and ' \
     'scripts/build_curriculum_manifest.py, then rebuild.') if missing else None"
